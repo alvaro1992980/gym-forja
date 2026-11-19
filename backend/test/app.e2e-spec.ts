@@ -7,7 +7,7 @@ describe('App foundation (e2e)', () => {
   let app: INestApplication<App>;
 
   beforeAll(async () => {
-    app = await createTestApp();
+    ({ app } = await createTestApp());
   });
 
   afterAll(async () => {

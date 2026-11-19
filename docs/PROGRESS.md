@@ -4,7 +4,7 @@
 |---|---|---|---|
 | D0 Repo & tooling | ✅ | 2026-11-19 | Monorepo created; fresh Flutter app in `mobile/`; Postgres 16 via compose (host port 5433, `gym` + `gym_test` DBs); README, docs, lint tooling. |
 | D1 Backend foundation | ✅ | 2026-11-19 | NestJS 11 + Prisma 6 API skeleton: typed config, core migration, error format, pino logs, helmet/CORS/throttler, Swagger, `/health`, `gym-date.ts` + `ClockService`, seed. 77 unit + 8 e2e tests. |
-| D2 Auth & users | ⬜ | | |
+| D2 Auth & users | ✅ | 2026-11-19 | Login/refresh (rotation + reuse detection)/logout/change-password/`/me`; global JWT, must-change-password and roles guards; phone normalization; temporary passwords; staff endpoints with [R-45]; login rate limit. |
 | D3 Memberships & payments | ⬜ | | |
 | D4 Mobile foundation | ⬜ | | |
 | D5 Admin member UI | ⬜ | | |
@@ -56,6 +56,23 @@ instructs. The Android `applicationId` is still `com.example.gym_app` (OPEN_QUES
 Done: API foundation in place, with every gate passing. Prisma 6 and Nest 11 were chosen
 deliberately, and the training/premium relations on `User` are deferred (see DECISIONS).
 
+## D2 — Auth & users
+
+- [x] `auth` module: `POST /auth/login`, `/auth/refresh` (rotation + reuse detection), `/auth/logout` (also removes the FCM device), `/auth/change-password`, `GET /me`
+- [x] JWT strategy (user reloaded per request, so deactivation is immediate), `@Roles()` + `RolesGuard`, `@CurrentUser()`, `@Public()`
+- [x] Global `MustChangePasswordGuard` with allow-list (change-password, logout, me)
+- [x] Phone normalization [R-40] (`src/common/phone/phone.ts`) with tests
+- [x] Temporary password generator [R-41] (8 chars, no 0/O/o/1/l/I) and argon2id hashing [R-42], with tests
+- [x] `POST/GET /admin/staff` (+ `/admin/staff/:id/deactivate|reactivate`, see DECISIONS); [R-43] token revocation; [R-45] last admin
+- [x] Login rate limit: 5/min per IP + phone
+- [x] Acceptance: seeded admin logs in and must change the password first (e2e uses the real seed; also checked by hand on the dev DB)
+- [x] Acceptance: a refresh token works once; reuse revokes all of that user's tokens (e2e)
+- [x] Acceptance: TRAINER, MEMBER and KIOSK get `403` on `/admin/*`; anonymous gets `401` (e2e)
+- [x] Verification: lint, test (111), test:e2e (49), build
+
+Done: authentication and staff management. Access tokens are checked against the database on
+every request, so deactivating a user or finishing the password change takes effect immediately.
+
 ## Manual QA checklists
 
 ### D0
@@ -71,3 +88,7 @@ deliberately, and the training/premium relations on `User` are deferred (see DEC
 - [x] Open `http://localhost:3000/api/docs` → Swagger UI loads
 - [x] Unknown route → `404 {"statusCode":404,"code":"NOT_FOUND","message":"…"}`
 - [x] Empty `JWT_ACCESS_SECRET` → the app refuses to start and names the variable
+
+### D2
+- [x] Dev DB: log in as the seeded admin (`70000000` / seed password) → `mustChangePassword: true`
+- [x] Same token: `GET /me` → 200; `GET /admin/staff` → 403 `PASSWORD_CHANGE_REQUIRED`

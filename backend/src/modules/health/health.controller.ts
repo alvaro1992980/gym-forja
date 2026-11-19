@@ -6,11 +6,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { Public } from '../../common/auth/decorators';
 import type { Response } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
 import { HealthResponseDto } from './health.dto';
 
 @ApiTags('health')
+@Public()
 @SkipThrottle()
 @Controller('health')
 export class HealthController {

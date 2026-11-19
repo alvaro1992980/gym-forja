@@ -3,12 +3,37 @@ import { Test } from '@nestjs/testing';
 import type { App } from 'supertest/types';
 import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/app.setup';
+import { ClockService, FixedClockService } from '../../src/common/clock/clock.service';
+import { AppConfigService } from '../../src/config/app-config.service';
+import { PrismaService } from '../../src/prisma/prisma.service';
 
-/** Boots the real AppModule with the same global setup as main.ts. */
-export async function createTestApp(): Promise<INestApplication<App>> {
-  const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+export interface TestApp {
+  app: INestApplication<App>;
+  prisma: PrismaService;
+  /** Present when the app was created with a fixed `now`. */
+  clock?: FixedClockService;
+}
+
+/**
+ * Boots the real AppModule with the same global setup as main.ts.
+ * Pass `now` to freeze the clock (section 11: tests never depend on the real date).
+ */
+export async function createTestApp(options: { now?: string } = {}): Promise<TestApp> {
+  let clock: FixedClockService | undefined;
+  let builder = Test.createTestingModule({ imports: [AppModule] });
+  if (options.now) {
+    const now = options.now;
+    builder = builder.overrideProvider(ClockService).useFactory({
+      inject: [AppConfigService],
+      factory: (config: AppConfigService) => {
+        clock = new FixedClockService(config, now);
+        return clock;
+      },
+    });
+  }
+  const moduleRef = await builder.compile();
   const app = moduleRef.createNestApplication<INestApplication<App>>({ bufferLogs: true });
   configureApp(app);
   await app.init();
-  return app;
+  return { app, prisma: app.get(PrismaService), clock };
 }

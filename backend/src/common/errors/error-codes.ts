@@ -25,6 +25,10 @@ export const ErrorCode = {
   ACCOUNT_INACTIVE: 'ACCOUNT_INACTIVE',
   PHONE_ALREADY_EXISTS: 'PHONE_ALREADY_EXISTS',
   EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS',
+  INVALID_REFRESH_TOKEN: 'INVALID_REFRESH_TOKEN',
+  WRONG_CURRENT_PASSWORD: 'WRONG_CURRENT_PASSWORD',
+  PASSWORD_UNCHANGED: 'PASSWORD_UNCHANGED',
+  LAST_ACTIVE_ADMIN: 'LAST_ACTIVE_ADMIN',
 
   // Memberships & payments (D3+)
   AMOUNT_NOTE_REQUIRED: 'AMOUNT_NOTE_REQUIRED',
@@ -59,6 +63,10 @@ export const DEFAULT_ERROR_MESSAGES: Record<ErrorCode, string> = {
   ACCOUNT_INACTIVE: 'Tu cuenta está desactivada. Acércate a recepción.',
   PHONE_ALREADY_EXISTS: 'Ya existe una cuenta con ese número de teléfono.',
   EMAIL_ALREADY_EXISTS: 'Ya existe una cuenta con ese correo.',
+  INVALID_REFRESH_TOKEN: 'Tu sesión expiró. Inicia sesión de nuevo.',
+  WRONG_CURRENT_PASSWORD: 'La contraseña actual no es correcta.',
+  PASSWORD_UNCHANGED: 'La nueva contraseña debe ser distinta de la actual.',
+  LAST_ACTIVE_ADMIN: 'Debe existir al menos un administrador activo.',
   AMOUNT_NOTE_REQUIRED: 'Si el monto cambia respecto al sugerido, debes agregar una nota.',
   MEMBERSHIP_EXPIRED: 'Tu membresía está vencida. Acércate a recepción para renovar.',
   QR_TOKEN_INVALID: 'Código no válido, vuelve a escanear.',
