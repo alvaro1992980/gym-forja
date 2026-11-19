@@ -10,6 +10,9 @@ import { AppConfigService } from './config/app-config.service';
 import { AppConfigModule } from './config/config.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
+import { MembershipsModule } from './modules/memberships/memberships.module';
+import { PricingModule } from './modules/pricing/pricing.module';
+import { SettingsModule } from './modules/settings/settings.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -27,6 +30,9 @@ import { PrismaModule } from './prisma/prisma.module';
     HealthModule,
     AuthModule,
     UsersModule,
+    PricingModule,
+    SettingsModule,
+    MembershipsModule,
   ],
   // Global guards run in this order: rate limit → access token → forced password change → roles.
   providers: [

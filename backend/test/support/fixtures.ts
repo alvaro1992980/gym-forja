@@ -80,3 +80,48 @@ export async function createAndLogin(
 export function bearer(token: string): [string, string] {
   return ['Authorization', `Bearer ${token}`];
 }
+
+export interface CreatedMember {
+  id: string;
+  phone: string;
+  temporaryPassword: string;
+  membership: { tier: string; startDate: string; endDate: string; daysLeft: number };
+  payments: { id: string; kind: string; amount: string }[];
+}
+
+/** POST /admin/members with sensible defaults (BASIC, 1 month, suggested amount, CASH). */
+export async function createMemberViaApi(
+  app: INestApplication<App>,
+  adminToken: string,
+  body: Record<string, unknown> = {},
+): Promise<CreatedMember> {
+  const res = await request(app.getHttpServer())
+    .post('/api/v1/admin/members')
+    .set(...bearer(adminToken))
+    .send({
+      firstName: 'Juan',
+      lastName: 'Pérez',
+      phone: uniquePhone(),
+      tier: 'BASIC',
+      months: 1,
+      amount: 150,
+      method: 'CASH',
+      ...body,
+    })
+    .expect(201);
+  return res.body as CreatedMember;
+}
+
+/** Logs in with the temporary password and sets DEFAULT_PASSWORD, returning a usable session. */
+export async function activateMember(
+  app: INestApplication<App>,
+  member: CreatedMember,
+): Promise<Session> {
+  const first = await login(app, member.phone, member.temporaryPassword);
+  await request(app.getHttpServer())
+    .post('/api/v1/auth/change-password')
+    .set(...bearer(first.accessToken))
+    .send({ currentPassword: member.temporaryPassword, newPassword: DEFAULT_PASSWORD })
+    .expect(204);
+  return login(app, member.phone, DEFAULT_PASSWORD);
+}

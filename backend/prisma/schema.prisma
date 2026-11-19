@@ -120,18 +120,22 @@ model RefreshToken {
 }
 
 model Membership {
-  id          String       @id @default(uuid())
-  memberId    String       @unique
-  member      User         @relation("MemberMembership", fields: [memberId], references: [id])
-  tier        Tier
-  startDate   DateTime     @db.Date // start of current continuous period
-  endDate     DateTime     @db.Date // inclusive last valid day
-  trainerId   String?
-  trainer     User?        @relation("TrainerMemberships", fields: [trainerId], references: [id])
-  payments    Payment[]
-  tierChanges TierChange[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                String       @id @default(uuid())
+  memberId          String       @unique
+  member            User         @relation("MemberMembership", fields: [memberId], references: [id])
+  tier              Tier
+  startDate         DateTime     @db.Date // start of current continuous period
+  endDate           DateTime     @db.Date // inclusive last valid day
+  // [R-09] Tier bought for a future period of an active membership, applied on nextTierStartDate
+  // (addition to PLAN section 6, see docs/DECISIONS.md).
+  nextTier          Tier?
+  nextTierStartDate DateTime?    @db.Date
+  trainerId         String?
+  trainer           User?        @relation("TrainerMemberships", fields: [trainerId], references: [id])
+  payments          Payment[]
+  tierChanges       TierChange[]
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
   @@index([endDate])
 }

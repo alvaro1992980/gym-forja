@@ -5,7 +5,7 @@
 | D0 Repo & tooling | ✅ | 2026-11-19 | Monorepo created; fresh Flutter app in `mobile/`; Postgres 16 via compose (host port 5433, `gym` + `gym_test` DBs); README, docs, lint tooling. |
 | D1 Backend foundation | ✅ | 2026-11-19 | NestJS 11 + Prisma 6 API skeleton: typed config, core migration, error format, pino logs, helmet/CORS/throttler, Swagger, `/health`, `gym-date.ts` + `ClockService`, seed. 77 unit + 8 e2e tests. |
 | D2 Auth & users | ✅ | 2026-11-19 | Login/refresh (rotation + reuse detection)/logout/change-password/`/me`; global JWT, must-change-password and roles guards; phone normalization; temporary passwords; staff endpoints with [R-45]; login rate limit. |
-| D3 Memberships & payments | ⬜ | | |
+| D3 Memberships & payments | ✅ | 2026-11-19 | Members CRUD + filters, renewals with preview, tier changes (prorated upgrade, downgrade warning, scheduled tier), voids with recalculation, pricing, settings, `/me/membership`, `/me/payments`. Every [R-01]–[R-16] tested. |
 | D4 Mobile foundation | ⬜ | | |
 | D5 Admin member UI | ⬜ | | |
 | D6 Check-in backend | ⬜ | | |
@@ -73,6 +73,25 @@ deliberately, and the training/premium relations on `User` are deferred (see DEC
 Done: authentication and staff management. Access tokens are checked against the database on
 every request, so deactivating a user or finishing the password change takes effect immediately.
 
+## D3 — Memberships, payments, pricing, settings
+
+- [x] `POST /admin/members`: user + membership + NEW payment in one transaction; `GET /admin/members/preview` for the new-member stepper
+- [x] `GET /admin/members` (filters `q`, `tier`, `status`, `expiringWithinDays`, `trainerId`; sort `name|endDate|createdAt`; paginated), `GET/PATCH /admin/members/:id`, deactivate / reactivate / reset-password
+- [x] Renewal preview + create (`kind=RENEWAL`) [R-07]–[R-10]; tier of a renewal applied now or scheduled [R-09]
+- [x] Tier change preview + apply: prorated upgrade (`kind=UPGRADE`, months 0) [R-13], downgrade warning [R-14], history kept [R-15], trainer unassigned when leaving PREMIUM [R-16]
+- [x] `POST /admin/payments/:id/void` with recalculation [R-12]; `GET /admin/payments` with filters and totals
+- [x] `GET/PUT /admin/pricing` [R-11], `GET/PUT /admin/settings`
+- [x] `GET /me/membership`, `GET /me/payments` (no notes, no voided)
+- [x] Unit tests: rules module (renewals, amounts, proration, replay with 6+ recalculation scenarios), payment DTO validation [R-06]
+- [x] Acceptance: every rule [R-01]–[R-16] has passing tests (unit and/or e2e; [R-40]–[R-45] too)
+- [x] Acceptance: creating a member returns a temporary password that works for login (e2e)
+- [x] Acceptance: voiding the last renewal restores the previous `endDate` (unit + e2e)
+- [x] Verification: lint, test (169), test:e2e (110), build
+
+Done: the full membership lifecycle on the backend. Added `Membership.nextTier` /
+`nextTierStartDate` (migration `membership_next_tier`) so [R-09] can schedule a tier for a
+future period (see DECISIONS).
+
 ## Manual QA checklists
 
 ### D0
@@ -92,3 +111,8 @@ every request, so deactivating a user or finishing the password change takes eff
 ### D2
 - [x] Dev DB: log in as the seeded admin (`70000000` / seed password) → `mustChangePassword: true`
 - [x] Same token: `GET /me` → 200; `GET /admin/staff` → 403 `PASSWORD_CHANGE_REQUIRED`
+
+### D3
+- [x] Dev DB: migration `membership_next_tier` applied (`prisma migrate status` up to date); app boots, `/health` ok
+- [x] Swagger lists the member, payment, pricing and settings endpoints
+- [ ] By hand in Swagger (optional, covered by e2e): create member → renew early → renew late → upgrade → downgrade → void → deactivate → reset password

@@ -325,6 +325,8 @@ describe('Auth (e2e)', () => {
         endDate: '2026-12-14',
         daysLeft: 26, // [R-02] (2026-12-14 − 2026-11-19) + 1
         status: 'active',
+        nextTier: null,
+        nextTierStartDate: null,
       });
       expect(res.body).not.toHaveProperty('medicalNotes');
       expect(res.body).not.toHaveProperty('passwordHash');

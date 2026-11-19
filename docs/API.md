@@ -32,6 +32,24 @@ Live OpenAPI documentation (Swagger) is served by the backend:
 | POST | `/admin/staff/:id/deactivate` | ADMIN | D2 | [R-43]; 409 `LAST_ACTIVE_ADMIN` [R-45]. |
 | POST | `/admin/staff/:id/reactivate` | ADMIN | D2 | |
 
+| GET | `/admin/members/preview` | ADMIN | D3 | `?tier&months&startDate?` → `{periodStart, periodEnd, suggestedAmount, currency, tierApplies}` for a new member. |
+| POST | `/admin/members` | ADMIN | D3 | User + membership + NEW payment (one transaction). Returns member detail + `temporaryPassword`. 400 `START_DATE_OUT_OF_RANGE`, `AMOUNT_NOTE_REQUIRED`; 409 phone/email. |
+| GET | `/admin/members` | ADMIN | D3 | `q, tier, status=active\|expiring\|expired\|inactive, expiringWithinDays, trainerId, sort=name\|endDate\|createdAt`, paginated. |
+| GET / PATCH | `/admin/members/:id` | ADMIN | D3 | Detail (profile incl. medical notes, membership, trainer, last 10 check-ins, payments). PATCH: profile fields only; `null` clears. |
+| POST | `/admin/members/:id/deactivate` · `/reactivate` · `/reset-password` | ADMIN | D3 | [R-43] / [R-44]; reset returns `temporaryPassword`. |
+| GET | `/admin/members/:id/payments/preview` | ADMIN | D3 | `?tier&months` → period [R-07]/[R-08], suggested amount [R-10], `tierApplies: unchanged\|now\|scheduled` [R-09]. |
+| POST | `/admin/members/:id/payments` | ADMIN | D3 | `{tier, months, amount, method, note?, applyTierNow?}` → `{payment, membership}`. |
+| POST | `/admin/members/:id/tier-change/preview` | ADMIN | D3 | `{toTier}` → `{fromTier, toTier, isUpgrade, daysLeft, suggestedAmount, currency, warning}`. |
+| POST | `/admin/members/:id/tier-change` | ADMIN | D3 | `{toTier, amount?, method?, note?}` → `{membership, payment\|null}`. 409 `MEMBERSHIP_EXPIRED`; 400 `TIER_UNCHANGED`, `PAYMENT_METHOD_REQUIRED`, `DOWNGRADE_HAS_NO_CHARGE`. |
+| POST | `/admin/payments/:id/void` | ADMIN | D3 | `{reason}` → `{payment, membership}` (dates recalculated). 409 `PAYMENT_ALREADY_VOIDED`. |
+| GET | `/admin/payments` | ADMIN | D3 | `from, to, method, memberId, includeVoided`, paginated, plus `totals {count, amount, currency}` (non-voided). |
+| GET / PUT | `/admin/pricing` | ADMIN | D3 | `[{tier, monthlyPrice, currency}]`; PUT `{prices: [{tier, monthlyPrice}]}` (1–3 tiers). |
+| GET / PUT | `/admin/settings` | ADMIN | D3 | `{gymName, timezone (read-only), checkinCooldownMinutes, insideWindowMinutes, defaultCountryCode}`. |
+| GET | `/me/membership` | MEMBER | D3 | `{tier, startDate, endDate, daysLeft, status, nextTier, nextTierStartDate, trainer}`. |
+| GET | `/me/payments` | MEMBER | D3 | Own non-voided payments, no notes, paginated. |
+
+Money is sent as a JSON number (≤ 2 decimals) and returned as a string (`"150.00"`).
+
 **Auth rules (D2):** every endpoint needs `Authorization: Bearer <accessToken>` unless marked
 public. While `mustChangePassword` is true, every endpoint except change-password, logout and
 `/me` returns `403 PASSWORD_CHANGE_REQUIRED`. Wrong role → `403 FORBIDDEN`.

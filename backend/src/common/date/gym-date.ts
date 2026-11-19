@@ -12,7 +12,7 @@
  */
 import { UTCDate } from '@date-fns/utc';
 import { addMonths } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
+import { formatInTimeZone, fromZonedTime } from 'date-fns-tz';
 
 /** A calendar date, stored as UTC midnight. Alias for readability. */
 export type LocalDate = Date;
@@ -57,6 +57,11 @@ export function formatLocalDate(d: LocalDate): string {
 export function toLocalDate(instant: Date, timeZone: string): LocalDate {
   if (Number.isNaN(instant.getTime())) throw new RangeError('Invalid instant');
   return parseLocalDate(formatInTimeZone(instant, timeZone, 'yyyy-MM-dd'));
+}
+
+/** The UTC instant of 00:00 on `date` in `timeZone` (for instant-range queries by local day). */
+export function startOfLocalDayUtc(date: LocalDate, timeZone: string): Date {
+  return fromZonedTime(`${formatLocalDate(date)}T00:00:00`, timeZone);
 }
 
 /** "Today" in the gym timezone. `now` must come from ClockService. */

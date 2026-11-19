@@ -33,6 +33,12 @@ export const ErrorCode = {
   // Memberships & payments (D3+)
   AMOUNT_NOTE_REQUIRED: 'AMOUNT_NOTE_REQUIRED',
   MEMBERSHIP_EXPIRED: 'MEMBERSHIP_EXPIRED',
+  START_DATE_OUT_OF_RANGE: 'START_DATE_OUT_OF_RANGE',
+  TIER_UNCHANGED: 'TIER_UNCHANGED',
+  PAYMENT_ALREADY_VOIDED: 'PAYMENT_ALREADY_VOIDED',
+  PAYMENT_METHOD_REQUIRED: 'PAYMENT_METHOD_REQUIRED',
+  DOWNGRADE_HAS_NO_CHARGE: 'DOWNGRADE_HAS_NO_CHARGE',
+  NO_MEMBERSHIP: 'NO_MEMBERSHIP',
 
   // Check-in (D6+)
   QR_TOKEN_INVALID: 'QR_TOKEN_INVALID',
@@ -69,6 +75,13 @@ export const DEFAULT_ERROR_MESSAGES: Record<ErrorCode, string> = {
   LAST_ACTIVE_ADMIN: 'Debe existir al menos un administrador activo.',
   AMOUNT_NOTE_REQUIRED: 'Si el monto cambia respecto al sugerido, debes agregar una nota.',
   MEMBERSHIP_EXPIRED: 'Tu membresía está vencida. Acércate a recepción para renovar.',
+  START_DATE_OUT_OF_RANGE:
+    'La fecha de inicio debe estar entre 7 días antes y 30 días después de hoy.',
+  TIER_UNCHANGED: 'El socio ya tiene ese plan.',
+  PAYMENT_ALREADY_VOIDED: 'Este pago ya fue anulado.',
+  PAYMENT_METHOD_REQUIRED: 'Indica el método de pago.',
+  DOWNGRADE_HAS_NO_CHARGE: 'Bajar de plan no tiene cobro.',
+  NO_MEMBERSHIP: 'No tienes una membresía registrada.',
   QR_TOKEN_INVALID: 'Código no válido, vuelve a escanear.',
   QR_TOKEN_EXPIRED: 'Código vencido, escanea de nuevo.',
   TIER_REQUIRED: 'Tu plan de membresía no incluye esta función.',

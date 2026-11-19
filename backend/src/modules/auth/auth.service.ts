@@ -6,6 +6,7 @@ import { ErrorCode } from '../../common/errors/error-codes';
 import { getDummyHash, hashPassword, verifyPassword } from '../../common/security/password';
 import { PrismaService } from '../../prisma/prisma.service';
 import { toMembershipSummary } from '../memberships/membership-view';
+import { MembershipsService } from '../memberships/memberships.service';
 import { AuthResponseDto, ChangePasswordDto, LoginDto, LogoutDto, MeResponseDto } from './dto';
 import { TokensService } from './tokens.service';
 
@@ -15,6 +16,7 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly tokens: TokensService,
     private readonly clock: ClockService,
+    private readonly memberships: MembershipsService,
   ) {}
 
   async login(dto: LoginDto): Promise<AuthResponseDto> {
@@ -56,10 +58,9 @@ export class AuthService {
   }
 
   async me(userId: string): Promise<MeResponseDto> {
-    const user = await this.prisma.user.findUniqueOrThrow({
-      where: { id: userId },
-      include: { membership: true },
-    });
+    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const membership =
+      user.role === 'MEMBER' ? await this.memberships.getCurrentByMember(userId) : null;
     return {
       id: user.id,
       role: user.role,
@@ -72,10 +73,7 @@ export class AuthService {
       gender: user.gender,
       emergencyContact: user.emergencyContact,
       // medicalNotes are never returned to members (section 10).
-      membership:
-        user.role === 'MEMBER' && user.membership
-          ? toMembershipSummary(user.membership, this.clock.today())
-          : null,
+      membership: membership ? toMembershipSummary(membership, this.clock.today()) : null,
     };
   }
 }

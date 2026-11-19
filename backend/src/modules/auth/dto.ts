@@ -67,6 +67,9 @@ export class MembershipSummaryDto {
   @ApiProperty({ example: '2026-12-18' }) endDate: string;
   @ApiProperty() daysLeft: number;
   @ApiProperty({ enum: MEMBERSHIP_STATUSES }) status: (typeof MEMBERSHIP_STATUSES)[number];
+  @ApiPropertyOptional({ enum: ['BASIC', 'PLUS', 'PREMIUM'], nullable: true }) nextTier:
+    string | null;
+  @ApiPropertyOptional({ nullable: true, type: String }) nextTierStartDate: string | null;
 }
 
 export class MeResponseDto {

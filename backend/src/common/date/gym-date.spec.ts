@@ -11,6 +11,7 @@ import {
   isStartDateAllowed,
   parseLocalDate,
   resolveStartDate,
+  startOfLocalDayUtc,
   todayLocal,
   toLocalDate,
 } from './gym-date';
@@ -66,6 +67,20 @@ describe('gym-date', () => {
 
     it('rejects invalid instants', () => {
       expect(() => toLocalDate(new Date('nope'), LA_PAZ)).toThrow(RangeError);
+    });
+  });
+
+  describe('startOfLocalDayUtc', () => {
+    it('returns the UTC instant of local midnight (La Paz is UTC-4)', () => {
+      expect(startOfLocalDayUtc(d('2026-11-19'), LA_PAZ).toISOString()).toBe(
+        '2026-11-19T04:00:00.000Z',
+      );
+    });
+
+    it('round-trips with toLocalDate', () => {
+      const instant = startOfLocalDayUtc(d('2027-01-01'), LA_PAZ);
+      expect(fmt(toLocalDate(instant, LA_PAZ))).toBe('2027-01-01');
+      expect(fmt(toLocalDate(new Date(instant.getTime() - 1), LA_PAZ))).toBe('2026-12-31');
     });
   });
 
