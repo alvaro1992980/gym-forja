@@ -7,6 +7,8 @@ export interface AuthUser {
   firstName: string;
   lastName: string;
   mustChangePassword: boolean;
+  /** Inactive users only reach routes marked @AllowInactiveAccount() [R-21]. */
+  isActive: boolean;
 }
 
 /** Claims of an access token. */

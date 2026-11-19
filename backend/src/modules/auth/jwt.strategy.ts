@@ -8,6 +8,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 /**
  * Verifies the access token, then loads the user on every request so that deactivation
  * [R-43] and the end of mustChangePassword take effect immediately, not after 15 minutes.
+ * Inactive users are rejected by JwtAuthGuard, except on @AllowInactiveAccount() routes.
  */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -36,13 +37,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         isActive: true,
       },
     });
-    if (!user || !user.isActive) return false;
+    if (!user) return false;
     return {
       id: user.id,
       role: user.role,
       firstName: user.firstName,
       lastName: user.lastName,
       mustChangePassword: user.mustChangePassword,
+      isActive: user.isActive,
     };
   }
 }

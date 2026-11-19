@@ -8,7 +8,7 @@
 | D3 Memberships & payments | ✅ | 2026-11-19 | Members CRUD + filters, renewals with preview, tier changes (prorated upgrade, downgrade warning, scheduled tier), voids with recalculation, pricing, settings, `/me/membership`, `/me/payments`. Every [R-01]–[R-16] tested. |
 | D4 Mobile foundation | ✅ | 2026-11-19 | Flutter app shell: Riverpod + go_router role redirects, dio client with token refresh, secure session storage, splash/login/change-password/logout, M3 theme, tier badge, state widgets, es/en localization, dev/staging/prod run configs. Verified on an Android emulator against the real backend. |
 | D5 Admin member UI | ✅ | 2026-11-19 | Admin bottom nav; members list (search, filters, paging), new-member stepper with one-time temporary password (copy/share), member detail, renew, tier change, void, edit, reset password, deactivate; Precios, Personal (staff creation), Configuración. Full flow verified on the emulator against the real backend. |
-| D6 Check-in backend | ⬜ | | |
+| D6 Check-in backend | ✅ | 2026-11-19 | Rotating kiosk QR tokens, `POST /checkins` with [R-17]–[R-23] and attempt logging, admin lists (check-ins, inside now, attempts), `/me/checkins`, Socket.IO `/realtime` with JWT handshake and `admins` room. |
 | D7 Check-in mobile | ⬜ | | |
 | D8 Notifications & scheduler | ⬜ | | |
 | D9 Dashboard & reports | ⬜ | | |
@@ -131,6 +131,21 @@ routes each role to its own (placeholder) home.
 Done: the admin can run memberships from the phone. Found and fixed on the way: full-width
 `FilledButton` theme broke buttons inside rows, and the two tab FABs shared a hero tag.
 
+## D6 — Check-in backend + realtime
+
+- [x] `kiosk` module: `GET /kiosk/qr-token` (KIOSK only), HS256 JWT with `QR_TOKEN_SECRET`, `{typ:"checkin", kid, jti, exp}`, valid 45 s, refresh every 30 s [R-18]
+- [x] `checkins` module: `POST /checkins` [R-17]–[R-22] with a `CheckinAttempt` per scan, response shape of 8.4 (`todayWorkout: null`), 10/min per member
+- [x] `GET /admin/checkins`, `/admin/checkins/inside` [R-23], `/admin/checkins/attempts`, `GET /me/checkins`
+- [x] Socket.IO gateway `/realtime`: JWT handshake, `admins` room, `checkin.created` / `checkin.denied` (plus `ready` / `unauthorized`)
+- [x] [R-21] deactivated accounts reach only `POST /checkins` (`@AllowInactiveAccount()`), every other route still 401
+- [x] e2e: valid scan; expired token; tampered token; another role's token used as the QR; duplicate within the cooldown; expired membership; inactive account; non-member calling `/checkins` (plus deactivated kiosk, rate limit, admin/me lists)
+- [x] Acceptance: every [R-17]–[R-23] test passes (unit + e2e: R-17 ×9, R-18 ×9, R-19 ×6, R-20 ×2, R-21 ×1, R-22 ×4, R-23 ×3)
+- [x] Acceptance: a socket test client receives `checkin.created` (and `checkin.denied`; none for duplicates or non-admin sockets)
+- [x] Verification: lint, format, test (185), test:e2e (132), build
+
+Done: the secure check-in flow runs on the server and admins get it live. The phone screens
+that use it (kiosk QR, scanner, live feed) are D7.
+
 ## Manual QA checklists
 
 ### D0
@@ -176,3 +191,8 @@ and payments screens:
 - [x] Deactivate, reset password
 - [x] Filters and search; create TRAINER and KIOSK
 - [ ] Same flow on a physical Android phone
+
+### D6
+- [x] Built app: Swagger lists `/kiosk/qr-token`, `/checkins`, `/admin/checkins`, `/admin/checkins/inside`, `/admin/checkins/attempts`, `/me/checkins` (31 paths)
+- [x] Built app: Socket.IO answers the handshake; a socket with a bad token gets `unauthorized` and is disconnected
+- [ ] End-to-end with real devices comes with D7 (kiosk + member phones)

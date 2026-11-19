@@ -6,7 +6,12 @@ import type { Request } from 'express';
 import { AppException } from '../errors/app.exception';
 import { ErrorCode } from '../errors/error-codes';
 import { AuthUser } from './auth-user';
-import { ALLOW_PASSWORD_CHANGE_PENDING_KEY, IS_PUBLIC_KEY, ROLES_KEY } from './decorators';
+import {
+  ALLOW_INACTIVE_KEY,
+  ALLOW_PASSWORD_CHANGE_PENDING_KEY,
+  IS_PUBLIC_KEY,
+  ROLES_KEY,
+} from './decorators';
 
 function getMeta<T>(reflector: Reflector, key: string, ctx: ExecutionContext): T | undefined {
   return reflector.getAllAndOverride<T>(key, [ctx.getHandler(), ctx.getClass()]);
@@ -28,8 +33,17 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(ctx);
   }
 
-  override handleRequest<TUser = AuthUser>(err: unknown, user: TUser | false): TUser {
+  override handleRequest<TUser = AuthUser>(
+    err: unknown,
+    user: TUser | false,
+    _info?: unknown,
+    ctx?: ExecutionContext,
+  ): TUser {
     if (err || !user) {
+      throw new AppException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED);
+    }
+    const inactive = (user as unknown as AuthUser).isActive === false;
+    if (inactive && !(ctx && getMeta<boolean>(this.reflector, ALLOW_INACTIVE_KEY, ctx))) {
       throw new AppException(HttpStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED);
     }
     return user;

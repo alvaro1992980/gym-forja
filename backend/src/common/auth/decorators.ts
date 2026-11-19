@@ -20,6 +20,15 @@ export const Roles = (...roles: Role[]) => SetMetadata(ROLES_KEY, roles);
 export const AllowWhenPasswordChangeRequired = () =>
   SetMetadata(ALLOW_PASSWORD_CHANGE_PENDING_KEY, true);
 
+export const ALLOW_INACTIVE_KEY = 'auth:allowInactive';
+
+/**
+ * A valid access token of a deactivated account still reaches this route, so the handler
+ * can record the attempt ([R-21] check-in with a stale session). Every other route answers
+ * 401 for deactivated accounts [R-43].
+ */
+export const AllowInactiveAccount = () => SetMetadata(ALLOW_INACTIVE_KEY, true);
+
 /** The authenticated user. Only valid on non-public routes. */
 export const CurrentUser = createParamDecorator((_data: unknown, ctx: ExecutionContext) => {
   const req = ctx.switchToHttp().getRequest<Request & { user?: AuthUser }>();

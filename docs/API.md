@@ -48,7 +48,28 @@ Live OpenAPI documentation (Swagger) is served by the backend:
 | GET | `/me/membership` | MEMBER | D3 | `{tier, startDate, endDate, daysLeft, status, nextTier, nextTierStartDate, trainer}`. |
 | GET | `/me/payments` | MEMBER | D3 | Own non-voided payments, no notes, paginated. |
 
+| GET | `/kiosk/qr-token` | KIOSK | D6 | `{token, expiresAt, refreshInSeconds: 30}`. JWT signed with `QR_TOKEN_SECRET`, claims `{typ:"checkin", kid, jti, iat, exp}`, valid 45 s [R-18]. |
+| POST | `/checkins` | MEMBER | D6 | `{qrToken}` → `200 {result: SUCCESS\|DUPLICATE, duplicate, checkinId, checkedInAt, member:{firstName}, membership:{tier, endDate, daysLeft}, todayWorkout: null}` [R-19]. 400 `QR_TOKEN_INVALID` / `QR_TOKEN_EXPIRED`; 403 `MEMBERSHIP_EXPIRED` (`details.endDate`) / `ACCOUNT_INACTIVE`. Every scan stores a `CheckinAttempt` [R-22]. 10/min per member. |
+| GET | `/admin/checkins` | ADMIN | D6 | `from, to` (gym dates, inclusive), `memberId`, paginated. |
+| GET | `/admin/checkins/inside` | ADMIN | D6 | `{count, windowMinutes, items}`: latest check-in of each member in the last `insideWindowMinutes` [R-23]. |
+| GET | `/admin/checkins/attempts` | ADMIN | D6 | Denied and invalid attempts by default; `result=` for one result; `from, to, memberId`, paginated. |
+| GET | `/me/checkins` | MEMBER | D6 | Own check-ins `{id, tier, createdAt}`, `from, to`, paginated. |
+
 Money is sent as a JSON number (≤ 2 decimals) and returned as a string (`"150.00"`).
+
+## Realtime (D6)
+
+Socket.IO namespace **`/realtime`** on the API host (e.g. `http://10.0.2.2:3000/realtime`).
+
+- Connect with the access token: `io(url + '/realtime', { auth: { token } })`. Invalid tokens,
+  deactivated accounts and pending password changes get an `unauthorized` event and are
+  disconnected.
+- After authentication the server emits **`ready`** `{rooms}`. Only ADMIN sockets join `admins`.
+- Events to `admins`:
+  - **`checkin.created`** `{checkinId, member: {id, firstName, lastName}, tier, daysLeft, createdAt}`
+    (not sent for duplicates [R-19]);
+  - **`checkin.denied`** `{member: {id, firstName, lastName}, reason: EXPIRED|INACTIVE, endDate, createdAt}`.
+- On reconnect, clients reload `GET /admin/checkins/inside` to fill any gap (section 8.5).
 
 **Auth rules (D2):** every endpoint needs `Authorization: Bearer <accessToken>` unless marked
 public. While `mustChangePassword` is true, every endpoint except change-password, logout and

@@ -9,9 +9,12 @@ import { AppThrottlerGuard } from './common/throttling/app-throttler.guard';
 import { AppConfigService } from './config/app-config.service';
 import { AppConfigModule } from './config/config.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CheckinsModule } from './modules/checkins/checkins.module';
 import { HealthModule } from './modules/health/health.module';
+import { KioskModule } from './modules/kiosk/kiosk.module';
 import { MembershipsModule } from './modules/memberships/memberships.module';
 import { PricingModule } from './modules/pricing/pricing.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -23,7 +26,7 @@ import { PrismaModule } from './prisma/prisma.module';
       inject: [AppConfigService],
       useFactory: buildLoggerParams,
     }),
-    // Default limit for every route; stricter per-route limits (login, check-in) come in D2/D6.
+    // Default limit for every route; login and check-in have stricter per-route limits.
     ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 120 }]),
     PrismaModule,
     ClockModule,
@@ -33,6 +36,9 @@ import { PrismaModule } from './prisma/prisma.module';
     PricingModule,
     SettingsModule,
     MembershipsModule,
+    KioskModule,
+    CheckinsModule,
+    RealtimeModule,
   ],
   // Global guards run in this order: rate limit → access token → forced password change → roles.
   providers: [
