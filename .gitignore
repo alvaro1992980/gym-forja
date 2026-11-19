@@ -1,0 +1,46 @@
+# ---------- Secrets / env ----------
+.env
+.env.*
+!.env.example
+**/key.properties
+*.keystore
+*.jks
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase-service-account*.json
+
+# ---------- Node / backend ----------
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.eslintcache
+
+# ---------- Flutter / Dart ----------
+# (mobile/.gitignore has the full Flutter-generated list)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+
+# ---------- IDE / OS ----------
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+*.swp
+.DS_Store
+Thumbs.db
+
+# ---------- Claude Code local settings ----------
+.claude/settings.local.json
+
+# ---------- Logs ----------
+*.log
+logs/

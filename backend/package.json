@@ -1,0 +1,26 @@
+{
+  "name": "gym-backend",
+  "version": "0.0.1",
+  "description": "Gym app API (NestJS). Scaffolded in D1; D0 only sets up lint/format tooling.",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" --no-error-on-unmatched-pattern",
+    "lint": "eslint \"{src,test}/**/*.ts\" --no-error-on-unmatched-pattern --fix",
+    "lint:check": "eslint \"{src,test}/**/*.ts\" --no-error-on-unmatched-pattern"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "eslint": "9.39.5",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.7",
+    "globals": "17.14.0",
+    "prettier": "3.10.1",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.73.0"
+  }
+}
