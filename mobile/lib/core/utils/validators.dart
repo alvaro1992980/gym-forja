@@ -21,6 +21,21 @@ class Validators {
         : null;
   }
 
+  static final _email = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
+  String? optionalEmail(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    return _email.hasMatch(value.trim()) ? null : _l10n.validationEmailInvalid;
+  }
+
+  /// Whole number in [min, max].
+  String? intInRange(String? value, int min, int max) {
+    final n = int.tryParse(value?.trim() ?? '');
+    return n == null || n < min || n > max
+        ? _l10n.validationIntRange(min, max)
+        : null;
+  }
+
   /// Login password: only required (old accounts may have any length).
   String? password(String? value) =>
       value == null || value.isEmpty ? _l10n.validationRequired : null;

@@ -278,4 +278,492 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get errorSessionAlreadyOpen => 'Ya tienes un entrenamiento en curso.';
+
+  @override
+  String get commonCancel => 'Cancelar';
+
+  @override
+  String get commonConfirm => 'Confirmar';
+
+  @override
+  String get commonSave => 'Guardar';
+
+  @override
+  String get commonContinue => 'Continuar';
+
+  @override
+  String get commonBack => 'Atrás';
+
+  @override
+  String get commonDone => 'Listo';
+
+  @override
+  String get commonSaved => 'Cambios guardados.';
+
+  @override
+  String get commonNotSet => '—';
+
+  @override
+  String get navDashboard => 'Dashboard';
+
+  @override
+  String get navMembers => 'Socios';
+
+  @override
+  String get navCheckins => 'Ingresos';
+
+  @override
+  String get navPlans => 'Planes';
+
+  @override
+  String get navMore => 'Más';
+
+  @override
+  String get membersSearchHint => 'Buscar por nombre o teléfono';
+
+  @override
+  String get filterActive => 'Activos';
+
+  @override
+  String get filterExpiring => 'Por vencer';
+
+  @override
+  String get filterExpired => 'Vencidos';
+
+  @override
+  String get filterInactive => 'Inactivos';
+
+  @override
+  String get membersEmpty => 'No hay socios con estos filtros.';
+
+  @override
+  String get membersNew => 'Nuevo socio';
+
+  @override
+  String memberDaysLeftShort(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count días',
+      one: '1 día',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String memberExpiredAgo(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Vencido hace $count días',
+      one: 'Vencido hace 1 día',
+      zero: 'Vencido',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get memberInactive => 'Inactivo';
+
+  @override
+  String memberLastCheckin(String date) {
+    return 'Último ingreso: $date';
+  }
+
+  @override
+  String get memberNoCheckins => 'Sin ingresos';
+
+  @override
+  String get memberTabMembership => 'Membresía';
+
+  @override
+  String get memberTabPayments => 'Pagos';
+
+  @override
+  String get memberTabCheckins => 'Ingresos';
+
+  @override
+  String get memberTabProfile => 'Datos';
+
+  @override
+  String get memberCall => 'Llamar';
+
+  @override
+  String get memberWhatsApp => 'WhatsApp';
+
+  @override
+  String get membershipStart => 'Inicio';
+
+  @override
+  String get membershipEnd => 'Vence';
+
+  @override
+  String membershipNextTier(String tier, String date) {
+    return 'Plan $tier desde el $date';
+  }
+
+  @override
+  String get actionRenew => 'Renovar';
+
+  @override
+  String get actionChangeTier => 'Cambiar plan';
+
+  @override
+  String get changeTierExpiredHint =>
+      'La membresía está vencida: renueva para cambiar de plan.';
+
+  @override
+  String get paymentKindNew => 'Inscripción';
+
+  @override
+  String get paymentKindRenewal => 'Renovación';
+
+  @override
+  String get paymentKindUpgrade => 'Cambio de plan';
+
+  @override
+  String paymentMonths(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count meses',
+      one: '1 mes',
+      zero: 'sin meses',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String paymentRecordedBy(String name, String date) {
+    return 'Registrado por $name · $date';
+  }
+
+  @override
+  String paymentVoided(String reason) {
+    return 'Anulado: $reason';
+  }
+
+  @override
+  String get paymentVoid => 'Anular';
+
+  @override
+  String get paymentsEmpty => 'Sin pagos.';
+
+  @override
+  String get voidTitle => 'Anular pago';
+
+  @override
+  String get voidInfo =>
+      'El pago queda registrado como anulado y las fechas de la membresía se recalculan.';
+
+  @override
+  String get voidReasonLabel => 'Motivo';
+
+  @override
+  String get voidDone => 'Pago anulado. Fechas recalculadas.';
+
+  @override
+  String get checkinsEmpty => 'Todavía no registró ingresos.';
+
+  @override
+  String get profileFirstName => 'Nombre';
+
+  @override
+  String get profileLastName => 'Apellido';
+
+  @override
+  String get profilePhone => 'Teléfono';
+
+  @override
+  String get profileEmail => 'Correo (opcional)';
+
+  @override
+  String get profileBirthDate => 'Fecha de nacimiento';
+
+  @override
+  String get profileGender => 'Género';
+
+  @override
+  String get profileEmergencyContact => 'Contacto de emergencia';
+
+  @override
+  String get profileMedicalNotes => 'Notas médicas';
+
+  @override
+  String get genderMale => 'Masculino';
+
+  @override
+  String get genderFemale => 'Femenino';
+
+  @override
+  String get genderOther => 'Otro';
+
+  @override
+  String get actionEdit => 'Editar datos';
+
+  @override
+  String get actionResetPassword => 'Restablecer contraseña';
+
+  @override
+  String get actionDeactivate => 'Desactivar';
+
+  @override
+  String get actionReactivate => 'Reactivar';
+
+  @override
+  String get resetPasswordConfirm =>
+      'Se generará una contraseña temporal nueva y se cerrarán todas sus sesiones. ¿Continuar?';
+
+  @override
+  String get deactivateConfirm =>
+      'La cuenta no podrá ingresar ni usar la app. ¿Desactivar?';
+
+  @override
+  String get reactivateConfirm => '¿Reactivar esta cuenta?';
+
+  @override
+  String get memberDeactivated => 'Cuenta desactivada.';
+
+  @override
+  String get memberReactivated => 'Cuenta reactivada.';
+
+  @override
+  String get editMemberTitle => 'Editar socio';
+
+  @override
+  String get fieldTier => 'Plan';
+
+  @override
+  String tierWithPrice(String price) {
+    return '$price/mes';
+  }
+
+  @override
+  String get fieldMonths => 'Meses';
+
+  @override
+  String get monthsOther => 'Otro';
+
+  @override
+  String get fieldStartDate => 'Fecha de inicio';
+
+  @override
+  String get startDateRangeHint =>
+      'Entre 7 días antes y 30 días después de hoy.';
+
+  @override
+  String get fieldAmount => 'Monto (Bs)';
+
+  @override
+  String get fieldMethod => 'Método de pago';
+
+  @override
+  String get fieldNote => 'Nota';
+
+  @override
+  String get noteRequiredHint =>
+      'Obligatoria si el monto cambia respecto al sugerido.';
+
+  @override
+  String get validationNoteRequired =>
+      'Agrega una nota: el monto es distinto al sugerido.';
+
+  @override
+  String get validationAmountInvalid =>
+      'Ingresa un monto válido (máximo 2 decimales).';
+
+  @override
+  String get validationEmailInvalid => 'Correo no válido.';
+
+  @override
+  String validationIntRange(int min, int max) {
+    return 'Ingresa un número entre $min y $max.';
+  }
+
+  @override
+  String get methodCash => 'Efectivo';
+
+  @override
+  String get methodTransfer => 'Transferencia';
+
+  @override
+  String get methodQr => 'QR';
+
+  @override
+  String get methodCard => 'Tarjeta';
+
+  @override
+  String get methodOther => 'Otro';
+
+  @override
+  String suggestedAmount(String amount) {
+    return 'Monto sugerido: $amount';
+  }
+
+  @override
+  String newPeriod(String start, String end) {
+    return 'Nuevo periodo: $start – $end';
+  }
+
+  @override
+  String get tierAppliesNow => 'El plan nuevo se aplica desde hoy.';
+
+  @override
+  String tierAppliesScheduled(String date) {
+    return 'El plan nuevo se aplica desde el $date.';
+  }
+
+  @override
+  String get applyTierNowLabel => 'Aplicar el plan nuevo desde hoy';
+
+  @override
+  String get renewTitle => 'Renovar membresía';
+
+  @override
+  String get renewConfirm => 'Confirmar pago';
+
+  @override
+  String get renewDone => 'Pago registrado.';
+
+  @override
+  String get tierChangeTitle => 'Cambiar plan';
+
+  @override
+  String tierChangeCurrent(String tier) {
+    return 'Plan actual: $tier';
+  }
+
+  @override
+  String get tierChangeTarget => 'Nuevo plan';
+
+  @override
+  String tierChangeUpgradeInfo(int days, String amount) {
+    return 'Cargo prorrateado sugerido por $days días restantes: $amount';
+  }
+
+  @override
+  String get tierChangeDowngradeWarning =>
+      'Bajar de plan se aplica de inmediato y no tiene reembolso.';
+
+  @override
+  String get tierChangePremiumWarning =>
+      'Al dejar Premium se quita el entrenador asignado.';
+
+  @override
+  String get tierChangeConfirm => 'Confirmar cambio';
+
+  @override
+  String get tierChangeDone => 'Plan actualizado.';
+
+  @override
+  String get newMemberTitle => 'Nuevo socio';
+
+  @override
+  String get stepPersonal => 'Datos personales';
+
+  @override
+  String get stepMembership => 'Membresía';
+
+  @override
+  String get stepPayment => 'Pago';
+
+  @override
+  String get stepSummary => 'Resumen';
+
+  @override
+  String get newMemberConfirm => 'Crear socio';
+
+  @override
+  String get tempPasswordTitle => 'Contraseña temporal';
+
+  @override
+  String tempPasswordCreated(String name) {
+    return 'Cuenta lista: $name';
+  }
+
+  @override
+  String tempPasswordUser(String phone) {
+    return 'Usuario: $phone';
+  }
+
+  @override
+  String get tempPasswordWarning =>
+      'Esta contraseña se muestra una sola vez. Cópiala o compártela ahora. Se pedirá cambiarla al ingresar.';
+
+  @override
+  String get tempPasswordCopy => 'Copiar';
+
+  @override
+  String get tempPasswordCopied => 'Contraseña copiada.';
+
+  @override
+  String get tempPasswordShare => 'Compartir por WhatsApp';
+
+  @override
+  String tempPasswordShareText(String name, String phone, String password) {
+    return 'Hola $name, ya puedes ingresar a la app del gimnasio.\nUsuario: $phone\nContraseña temporal: $password\nTe pedirá cambiarla al entrar.';
+  }
+
+  @override
+  String get morePricing => 'Precios';
+
+  @override
+  String get moreStaff => 'Personal';
+
+  @override
+  String get moreReports => 'Reportes';
+
+  @override
+  String get moreSettings => 'Configuración del gimnasio';
+
+  @override
+  String get moreProfile => 'Mi perfil';
+
+  @override
+  String get pricingInfo =>
+      'Precio mensual de cada plan. Cambiarlo no afecta pagos anteriores.';
+
+  @override
+  String pricingMonthly(String tier) {
+    return '$tier (Bs por mes)';
+  }
+
+  @override
+  String get staffAll => 'Todos';
+
+  @override
+  String get staffShowInactive => 'Mostrar inactivos';
+
+  @override
+  String get staffEmpty => 'No hay cuentas.';
+
+  @override
+  String get staffNew => 'Nueva cuenta';
+
+  @override
+  String get newStaffTitle => 'Nueva cuenta de personal';
+
+  @override
+  String get fieldRole => 'Rol';
+
+  @override
+  String get staffCreate => 'Crear cuenta';
+
+  @override
+  String get settingsGymName => 'Nombre del gimnasio';
+
+  @override
+  String get settingsCooldown => 'Minutos entre ingresos (evita duplicados)';
+
+  @override
+  String get settingsInsideWindow => 'Minutos que cuentan como \"adentro\"';
+
+  @override
+  String get settingsCountryCode => 'Código de país por defecto';
+
+  @override
+  String get settingsTimezone => 'Zona horaria';
+
+  @override
+  String get settingsTimezoneHint => 'Se configura en el servidor.';
 }

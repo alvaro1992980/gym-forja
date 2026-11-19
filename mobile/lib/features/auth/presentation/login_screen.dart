@@ -5,6 +5,7 @@ import '../../../core/auth/session_controller.dart';
 import '../../../core/network/error_messages.dart';
 import '../../../core/utils/phone.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/widgets/phone_field.dart';
 import '../../../l10n/generated/app_localizations.dart';
 
 /// Phone + password login (section 9.1 #2).
@@ -90,24 +91,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         style: theme.textTheme.bodyMedium,
                       ),
                       const SizedBox(height: 32),
-                      TextFormField(
+                      PhoneField(
                         key: const Key('login.phone'),
                         controller: _phone,
-                        keyboardType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
-                        autofillHints: const [AutofillHints.telephoneNumber],
-                        decoration: InputDecoration(
-                          labelText: l10n.loginPhoneLabel,
-                          hintText: l10n.loginPhoneHint,
-                          prefixIcon: _CountryCodePicker(
-                            value: _countryCode,
-                            label: l10n.loginCountryCodeLabel,
-                            onChanged: (code) =>
-                                setState(() => _countryCode = code),
-                          ),
-                        ),
-                        validator: (v) =>
-                            validators.phone(v, countryCode: _countryCode),
+                        countryCode: _countryCode,
+                        autofill: true,
+                        onCountryCodeChanged: (code) =>
+                            setState(() => _countryCode = code),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -161,41 +151,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CountryCodePicker extends StatelessWidget {
-  const _CountryCodePicker({
-    required this.value,
-    required this.label,
-    required this.onChanged,
-  });
-
-  final String value;
-  final String label;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      label: label,
-      child: Padding(
-        padding: const EdgeInsetsDirectional.only(start: 12, end: 4),
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<String>(
-            key: const Key('login.countryCode'),
-            value: value,
-            items: [
-              for (final code in countryCodes)
-                DropdownMenuItem(value: code, child: Text(code)),
-            ],
-            onChanged: (code) {
-              if (code != null) onChanged(code);
-            },
           ),
         ),
       ),

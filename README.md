@@ -130,6 +130,24 @@ flutter gen-l10n                 # lib/l10n/generated/ (also runs on flutter run
 
 UI text lives in `lib/l10n/app_es.arb` (default) and `app_en.arb`; never hard-code strings.
 
+### Integration test (real backend, emulator)
+
+`mobile/integration_test/` drives the real app against a running backend: it logs in as the
+seeded admin (who must still have to change the password), creates members, renews, changes tier,
+voids, resets a password, deactivates, filters the list and creates staff. Run it against a
+throwaway database, never the dev one. For example, with the backend started on `gym_test`:
+
+```bash
+# backend/: fresh QA data (truncate gym_test first, e.g. by running npm run test:e2e)
+DATABASE_URL=<DATABASE_URL_TEST> npx prisma migrate deploy
+DATABASE_URL=<DATABASE_URL_TEST> SEED_ADMIN_PASSWORD=QaSeed1234 npx prisma db seed
+DATABASE_URL=<DATABASE_URL_TEST> npm run start:dev
+
+# mobile/: clear the app's data first (adb shell pm clear com.example.gym_app)
+flutter test integration_test -d emulator-5554 --dart-define-from-file=config/dev.json \
+  --dart-define=QA_ADMIN_PHONE=70000000 --dart-define=QA_ADMIN_PASSWORD=QaSeed1234
+```
+
 ## 4. Quality gates
 
 Run these before every commit (see section 0.8 of the [plan](docs/PLAN.md)):

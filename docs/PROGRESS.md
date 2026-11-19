@@ -7,7 +7,7 @@
 | D2 Auth & users | ✅ | 2026-11-19 | Login/refresh (rotation + reuse detection)/logout/change-password/`/me`; global JWT, must-change-password and roles guards; phone normalization; temporary passwords; staff endpoints with [R-45]; login rate limit. |
 | D3 Memberships & payments | ✅ | 2026-11-19 | Members CRUD + filters, renewals with preview, tier changes (prorated upgrade, downgrade warning, scheduled tier), voids with recalculation, pricing, settings, `/me/membership`, `/me/payments`. Every [R-01]–[R-16] tested. |
 | D4 Mobile foundation | ✅ | 2026-11-19 | Flutter app shell: Riverpod + go_router role redirects, dio client with token refresh, secure session storage, splash/login/change-password/logout, M3 theme, tier badge, state widgets, es/en localization, dev/staging/prod run configs. Verified on an Android emulator against the real backend. |
-| D5 Admin member UI | ⬜ | | |
+| D5 Admin member UI | ✅ | 2026-11-19 | Admin bottom nav; members list (search, filters, paging), new-member stepper with one-time temporary password (copy/share), member detail, renew, tier change, void, edit, reset password, deactivate; Precios, Personal (staff creation), Configuración. Full flow verified on the emulator against the real backend. |
 | D6 Check-in backend | ⬜ | | |
 | D7 Check-in mobile | ⬜ | | |
 | D8 Notifications & scheduler | ⬜ | | |
@@ -111,6 +111,26 @@ future period (see DECISIONS).
 Done: the app shell talks to the real backend with a persistent, self-refreshing session and
 routes each role to its own (placeholder) home.
 
+## D5 — Admin: member management UI
+
+- [x] Admin shell with bottom nav (Dashboard · Socios · Ingresos · Planes · Más); Dashboard/Ingresos/Planes are placeholders until D9/D7/D11
+- [x] 9.3 #2 Members list: search (debounced), chips Activos / Por vencer / Vencidos / Inactivos + tier, rows with tier badge, "12 días" / "Vencido hace 3 días" / "Inactivo", last check-in, infinite scroll, pull-to-refresh, FAB "Nuevo socio"
+- [x] 9.3 #3 New member stepper (personal data → tier with price, months 1/2/3/6/12 or other, start date within [R-05] → preview + amount/method/note [R-10] → summary) and the temporary password screen (shown once, Copiar, Compartir por WhatsApp)
+- [x] 9.3 #4 Member detail: header (days-left ring, tier, status, call/WhatsApp), tabs Membresía / Pagos (void) / Ingresos / Datos (edit, reset password, deactivate/reactivate)
+- [x] 9.3 #5 Renew: tier + months → preview period and suggested amount → amount, method, note; scheduled tier with "apply now" [R-09]
+- [x] 9.3 #6 Tier change: upgrade shows the prorated suggestion [R-13], downgrade the warning [R-14] (+ trainer removal from PREMIUM [R-16])
+- [x] Más → Precios [R-11], Personal (list, role filter, inactive toggle, create ADMIN/TRAINER/KIOSK, deactivate [R-45]), Configuración (time zone read-only), Mi perfil, Cerrar sesión
+- [x] Acceptance: create a member with the stepper; temporary password shown once with copy/share (widget test + emulator)
+- [x] Acceptance: list filters (active/expiring/expired/inactive/tier) and search work against the backend (emulator)
+- [x] Acceptance: renew shows the correct new period from the preview before confirming ([R-07] early: day after endDate; [R-08] late: today; emulator)
+- [x] Acceptance: upgrade shows the prorated suggestion; downgrade shows the warning (widget tests + emulator)
+- [x] Acceptance: void asks for a reason and refreshes the member's dates (voiding the renewal restored the previous endDate on the emulator)
+- [x] Acceptance: create a TRAINER and a KIOSK account (widget tests + emulator)
+- [x] Verification: `flutter analyze` (no issues), `flutter test` (77), `dart format --set-exit-if-changed .`; integration test on the emulator passed
+
+Done: the admin can run memberships from the phone. Found and fixed on the way: full-width
+`FilledButton` theme broke buttons inside rows, and the two tab FABs shared a hero tag.
+
 ## Manual QA checklists
 
 ### D0
@@ -143,3 +163,16 @@ routes each role to its own (placeholder) home.
 - [x] Dev DB restored afterwards (admin back to the seed password with `mustChangePassword = true`)
 - [ ] Real Android phone on the LAN (`--dart-define=API_BASE_URL=http://<PC IP>:3000`); only the emulator was used
 - [ ] Spanish UI check on a device set to Spanish (the emulator was in English; widget tests cover the strings)
+
+### D5
+Run as `integration_test/admin_members_flow_test.dart` on the Pixel 9 emulator against the real
+backend on the `gym_test` database (dev DB untouched), plus a visual check of the list, detail
+and payments screens:
+- [x] Create member (stepper → temporary password → detail)
+- [x] Renew early (new period starts the day after `endDate`)
+- [x] Renew late (expired member; new period starts today)
+- [x] Upgrade (prorated suggestion shown) and downgrade (warning shown)
+- [x] Void (reason required; `endDate` back to the previous value)
+- [x] Deactivate, reset password
+- [x] Filters and search; create TRAINER and KIOSK
+- [ ] Same flow on a physical Android phone

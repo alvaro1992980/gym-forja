@@ -2,7 +2,19 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../features/admin/members/presentation/edit_member_screen.dart';
+import '../../features/admin/members/presentation/member_detail_screen.dart';
+import '../../features/admin/members/presentation/members_list_screen.dart';
+import '../../features/admin/members/presentation/new_member_screen.dart';
+import '../../features/admin/members/presentation/renew_screen.dart';
+import '../../features/admin/members/presentation/tier_change_screen.dart';
 import '../../features/admin/presentation/admin_home_screen.dart';
+import '../../features/admin/presentation/admin_shell.dart';
+import '../../features/admin/settings/presentation/more_screen.dart';
+import '../../features/admin/settings/presentation/pricing_screen.dart';
+import '../../features/admin/settings/presentation/settings_screen.dart';
+import '../../features/admin/shared/temporary_password_screen.dart';
+import '../../features/admin/staff/presentation/staff_screens.dart';
 import '../../features/auth/presentation/change_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/splash_screen.dart';
@@ -53,12 +65,23 @@ String? redirectFor(SessionState session, String location) {
   }
 }
 
+final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
+/// Full-screen admin page above the bottom navigation.
+GoRoute _fullScreen(String path, Widget Function(GoRouterState s) build) =>
+    GoRoute(
+      path: path,
+      parentNavigatorKey: _rootKey,
+      builder: (_, state) => build(state),
+    );
+
 @Riverpod(keepAlive: true)
 GoRouter router(Ref ref) {
   final refresh = ValueNotifier<int>(0);
   ref.listen(sessionControllerProvider, (_, _) => refresh.value++);
 
   final router = GoRouter(
+    navigatorKey: _rootKey,
     initialLocation: Routes.splash,
     refreshListenable: refresh,
     redirect: (context, state) =>
@@ -70,7 +93,7 @@ GoRouter router(Ref ref) {
         path: Routes.changePassword,
         builder: (_, _) => const ChangePasswordScreen(),
       ),
-      GoRoute(path: Routes.admin, builder: (_, _) => const AdminHomeScreen()),
+      ..._adminRoutes(),
       GoRoute(
         path: Routes.trainer,
         builder: (_, _) => const TrainerHomeScreen(),
@@ -85,3 +108,100 @@ GoRouter router(Ref ref) {
   });
   return router;
 }
+
+List<RouteBase> _adminRoutes() => [
+  StatefulShellRoute.indexedStack(
+    builder: (_, _, shell) => AdminShell(shell: shell),
+    branches: [
+      StatefulShellBranch(
+        routes: [
+          GoRoute(
+            path: Routes.admin,
+            builder: (_, _) => const AdminHomeScreen(),
+          ),
+        ],
+      ),
+      StatefulShellBranch(
+        routes: [
+          GoRoute(
+            path: '/admin/members',
+            builder: (_, _) => const MembersListScreen(),
+            routes: [
+              _fullScreen('new', (_) => const NewMemberScreen()),
+              GoRoute(
+                path: ':id',
+                builder: (_, s) =>
+                    MemberDetailScreen(memberId: s.pathParameters['id']!),
+                routes: [
+                  _fullScreen(
+                    'renew',
+                    (s) => RenewScreen(memberId: s.pathParameters['id']!),
+                  ),
+                  _fullScreen(
+                    'tier-change',
+                    (s) => TierChangeScreen(memberId: s.pathParameters['id']!),
+                  ),
+                  _fullScreen(
+                    'edit',
+                    (s) => EditMemberScreen(memberId: s.pathParameters['id']!),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+      StatefulShellBranch(
+        routes: [
+          GoRoute(
+            path: '/admin/checkins',
+            builder: (_, _) => ComingSoonScreen(title: (l) => l.navCheckins),
+          ),
+        ],
+      ),
+      StatefulShellBranch(
+        routes: [
+          GoRoute(
+            path: '/admin/plans',
+            builder: (_, _) => ComingSoonScreen(title: (l) => l.navPlans),
+          ),
+        ],
+      ),
+      StatefulShellBranch(
+        routes: [
+          GoRoute(
+            path: '/admin/more',
+            builder: (_, _) => const MoreScreen(),
+            routes: [
+              GoRoute(
+                path: 'pricing',
+                builder: (_, _) => const PricingScreen(),
+              ),
+              GoRoute(
+                path: 'staff',
+                builder: (_, _) => const StaffListScreen(),
+                routes: [_fullScreen('new', (_) => const NewStaffScreen())],
+              ),
+              GoRoute(
+                path: 'settings',
+                builder: (_, _) => const SettingsScreen(),
+              ),
+              GoRoute(
+                path: 'profile',
+                builder: (_, _) => const AdminProfileScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ],
+  ),
+  GoRoute(
+    path: '/admin/temporary-password',
+    parentNavigatorKey: _rootKey,
+    redirect: (_, state) =>
+        state.extra is TemporaryPasswordArgs ? null : Routes.admin,
+    builder: (_, state) =>
+        TemporaryPasswordScreen(args: state.extra! as TemporaryPasswordArgs),
+  ),
+];

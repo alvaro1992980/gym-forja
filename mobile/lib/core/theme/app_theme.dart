@@ -21,7 +21,9 @@ abstract final class AppTheme {
         border: OutlineInputBorder(),
       ),
       filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+        // 48 dp tap targets (section 10). Width stays intrinsic so buttons
+        // also work inside rows; full-width buttons come from their parent.
+        style: FilledButton.styleFrom(minimumSize: const Size(64, 48)),
       ),
     );
   }
