@@ -34,6 +34,7 @@ build/
 *.iml
 .vscode/*
 !.vscode/extensions.json
+!.vscode/launch.json
 *.swp
 .DS_Store
 Thumbs.db

@@ -6,7 +6,7 @@
 | D1 Backend foundation | ✅ | 2026-11-19 | NestJS 11 + Prisma 6 API skeleton: typed config, core migration, error format, pino logs, helmet/CORS/throttler, Swagger, `/health`, `gym-date.ts` + `ClockService`, seed. 77 unit + 8 e2e tests. |
 | D2 Auth & users | ✅ | 2026-11-19 | Login/refresh (rotation + reuse detection)/logout/change-password/`/me`; global JWT, must-change-password and roles guards; phone normalization; temporary passwords; staff endpoints with [R-45]; login rate limit. |
 | D3 Memberships & payments | ✅ | 2026-11-19 | Members CRUD + filters, renewals with preview, tier changes (prorated upgrade, downgrade warning, scheduled tier), voids with recalculation, pricing, settings, `/me/membership`, `/me/payments`. Every [R-01]–[R-16] tested. |
-| D4 Mobile foundation | ⬜ | | |
+| D4 Mobile foundation | ✅ | 2026-11-19 | Flutter app shell: Riverpod + go_router role redirects, dio client with token refresh, secure session storage, splash/login/change-password/logout, M3 theme, tier badge, state widgets, es/en localization, dev/staging/prod run configs. Verified on an Android emulator against the real backend. |
 | D5 Admin member UI | ⬜ | | |
 | D6 Check-in backend | ⬜ | | |
 | D7 Check-in mobile | ⬜ | | |
@@ -92,6 +92,25 @@ Done: the full membership lifecycle on the backend. Added `Membership.nextTier` 
 `nextTierStartDate` (migration `membership_next_tier`) so [R-09] can schedule a tier for a
 future period (see DECISIONS).
 
+## D4 — Mobile foundation
+
+- [x] Dependencies from 5.3 for the foundation (riverpod + riverpod_generator, go_router, dio, flutter_secure_storage, freezed, json_serializable, build_runner, intl, flutter_localizations, mocktail); feature plugins come with their deliverables (see DECISIONS)
+- [x] `core/config`: `APP_ENV` + `API_BASE_URL` via `--dart-define-from-file=config/{dev,staging,prod}.json`, VS Code launch configs, documented in the README
+- [x] dio client + `AuthInterceptor`: attaches the token, refreshes once on `401`, queues concurrent requests behind one refresh, logs out when the refresh token is rejected
+- [x] Error mapping from every backend `code` to localized messages (`core/network/error_messages.dart`)
+- [x] Secure token storage, `SessionController`; splash → `/me` → route by role (Retry when offline)
+- [x] Login (phone with +591 prefix selector [R-40], show/hide password), forced change password (strength hint), logout
+- [x] go_router with role redirects and placeholder homes for ADMIN / TRAINER / MEMBER / KIOSK
+- [x] Material 3 theme (light/dark), `TierBadge`, `LoadingView` / `ErrorView` / `EmptyView`
+- [x] `app_es.arb` (default) + `app_en.arb`; no hard-coded UI strings
+- [x] Acceptance: on the Android emulator (Pixel 9), the seeded admin logs in → forced password change → admin home (real backend)
+- [x] Acceptance: closing (force-stop) and reopening the app keeps the session
+- [x] Acceptance: with `JWT_ACCESS_TTL=1m`, after the token expired the reopened app went straight to the admin home; backend log: `GET /me 401 → POST /auth/refresh 200 → GET /me 200`
+- [x] Verification: `flutter analyze` (no issues), `flutter test` (45: login form validation, splash routing, interceptor, redirects, validators, error mapping), `dart format --set-exit-if-changed .`
+
+Done: the app shell talks to the real backend with a persistent, self-refreshing session and
+routes each role to its own (placeholder) home.
+
 ## Manual QA checklists
 
 ### D0
@@ -116,3 +135,11 @@ future period (see DECISIONS).
 - [x] Dev DB: migration `membership_next_tier` applied (`prisma migrate status` up to date); app boots, `/health` ok
 - [x] Swagger lists the member, payment, pricing and settings endpoints
 - [ ] By hand in Swagger (optional, covered by e2e): create member → renew early → renew late → upgrade → downgrade → void → deactivate → reset password
+
+### D4
+- [x] Emulator, dev config: login screen → seeded admin (`70000000`) → change password (strength hint shown) → "Administración" home with snackbar
+- [x] Force-stop + reopen after > 1 min with `JWT_ACCESS_TTL=1m` → admin home without logging in again
+- [x] Logout → `POST /auth/logout` 204 → login screen
+- [x] Dev DB restored afterwards (admin back to the seed password with `mustChangePassword = true`)
+- [ ] Real Android phone on the LAN (`--dart-define=API_BASE_URL=http://<PC IP>:3000`); only the emulator was used
+- [ ] Spanish UI check on a device set to Spanish (the emulator was in English; widget tests cover the strings)

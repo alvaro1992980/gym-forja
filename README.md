@@ -89,10 +89,46 @@ npm run test:e2e              # e2e tests against DATABASE_URL_TEST (the gym_tes
 ```bash
 cd mobile
 flutter pub get
-flutter run              # with an emulator running or a phone connected via USB
+flutter run --dart-define-from-file=config/dev.json   # emulator running or phone on USB
 ```
 
-Environment flavors (`--dart-define=API_BASE_URL=...` for dev/staging/prod) are added in **D4**.
+The backend must be running (section 2). Log in with the seeded admin
+(`SEED_ADMIN_PHONE` without the `+591`, e.g. `70000000`, and `SEED_ADMIN_PASSWORD`).
+
+### Environments (run configurations)
+
+The app reads `APP_ENV` and `API_BASE_URL` at build time (`lib/core/config/app_config.dart`).
+Each environment has a file in `mobile/config/`:
+
+| Environment | Command | `API_BASE_URL` |
+|---|---|---|
+| dev | `flutter run --dart-define-from-file=config/dev.json` | `http://10.0.2.2:3000` (the Android emulator's address for your PC) |
+| staging | `flutter run --dart-define-from-file=config/staging.json` | placeholder until a staging server exists |
+| prod | `flutter run --release --dart-define-from-file=config/prod.json` | placeholder until production exists (D14) |
+
+VS Code has the same three as launch configurations (`.vscode/launch.json`: *mobile (dev)*,
+*mobile (staging)*, *mobile (prod)*). Without any define the app uses the dev values.
+
+**Real phone on the same Wi-Fi:** override the URL with your PC's LAN IP, e.g.
+`flutter run --dart-define-from-file=config/dev.json --dart-define=API_BASE_URL=http://192.168.1.20:3000`,
+and allow port 3000 through the PC firewall. Plain HTTP is allowed only in debug builds.
+
+**Testing token refresh:** set `JWT_ACCESS_TTL=1m` in `backend/.env`, restart the backend, log in,
+wait over a minute and use the app: the next request gets `401`, the app refreshes the token and
+retries without logging you out.
+
+### Code generation
+
+Models (freezed/json_serializable), Riverpod providers and translations are generated. The
+generated files are committed, so a fresh clone runs as is. After changing an annotated class
+or an `.arb` file:
+
+```bash
+dart run build_runner build      # *.g.dart, *.freezed.dart
+flutter gen-l10n                 # lib/l10n/generated/ (also runs on flutter run/test)
+```
+
+UI text lives in `lib/l10n/app_es.arb` (default) and `app_en.arb`; never hard-code strings.
 
 ## 4. Quality gates
 
