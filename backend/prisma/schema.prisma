@@ -1,0 +1,247 @@
+// Data model — docs/PLAN.md section 6.
+// D1 contains the CORE models only. Training models (Exercise, Plan, PlanDay, PlanExercise,
+// PlanAssignment, WorkoutSession, SetLog) arrive in D11 and Premium models (Measurement,
+// TrainerNote, MemberGoal) in D13, together with their back-relations on User
+// (see docs/DECISIONS.md).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TRAINER
+  MEMBER
+  KIOSK
+}
+
+enum Tier {
+  BASIC
+  PLUS
+  PREMIUM
+}
+
+enum PaymentMethod {
+  CASH
+  TRANSFER
+  QR
+  CARD
+  OTHER
+}
+
+enum PaymentKind {
+  NEW
+  RENEWAL
+  UPGRADE
+  ADJUSTMENT
+}
+
+enum CheckinResult {
+  SUCCESS
+  DUPLICATE
+  DENIED_EXPIRED
+  DENIED_INACTIVE
+  INVALID_TOKEN
+}
+
+enum NotificationType {
+  CHECKIN_ADMIN
+  CHECKIN_MEMBER
+  CHECKIN_DENIED_ADMIN
+  CHECKIN_DENIED_MEMBER
+  EXPIRING_7
+  EXPIRING_3
+  EXPIRING_1
+  EXPIRED_MEMBER
+  ADMIN_DAILY_SUMMARY
+  PAYMENT_RECORDED
+  TIER_CHANGED
+  PLAN_ASSIGNED
+  TRAINER_ASSIGNED
+  TRAINER_NOTE
+}
+
+enum MuscleGroup {
+  CHEST
+  BACK
+  SHOULDERS
+  BICEPS
+  TRICEPS
+  LEGS
+  GLUTES
+  CORE
+  CARDIO
+  FULL_BODY
+  OTHER
+}
+
+model User {
+  id                 String    @id @default(uuid())
+  role               Role
+  firstName          String
+  lastName           String
+  phone              String    @unique // normalized, e.g. +59171234567
+  email              String?   @unique
+  passwordHash       String
+  mustChangePassword Boolean   @default(true)
+  isActive           Boolean   @default(true)
+  birthDate          DateTime? @db.Date
+  gender             String?
+  emergencyContact   String?
+  medicalNotes       String? // visible to admin/trainer only
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  membership         Membership?      @relation("MemberMembership")
+  trainedMemberships Membership[]     @relation("TrainerMemberships")
+  refreshTokens      RefreshToken[]
+  devices            Device[]
+  checkins           Checkin[]
+  checkinAttempts    CheckinAttempt[]
+  notifications      Notification[]
+  paymentsRecorded   Payment[]        @relation("PaymentRecordedBy")
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Membership {
+  id          String       @id @default(uuid())
+  memberId    String       @unique
+  member      User         @relation("MemberMembership", fields: [memberId], references: [id])
+  tier        Tier
+  startDate   DateTime     @db.Date // start of current continuous period
+  endDate     DateTime     @db.Date // inclusive last valid day
+  trainerId   String?
+  trainer     User?        @relation("TrainerMemberships", fields: [trainerId], references: [id])
+  payments    Payment[]
+  tierChanges TierChange[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([endDate])
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  membershipId    String
+  membership      Membership    @relation(fields: [membershipId], references: [id])
+  kind            PaymentKind
+  tier            Tier
+  months          Int // 0 for UPGRADE/ADJUSTMENT
+  periodStart     DateTime?     @db.Date
+  periodEnd       DateTime?     @db.Date
+  amount          Decimal       @db.Decimal(10, 2)
+  suggestedAmount Decimal       @db.Decimal(10, 2)
+  currency        String        @default("BOB")
+  method          PaymentMethod
+  note            String?
+  recordedById    String
+  recordedBy      User          @relation("PaymentRecordedBy", fields: [recordedById], references: [id])
+  paidAt          DateTime      @default(now())
+  voidedAt        DateTime?
+  voidedById      String?
+  voidReason      String?
+
+  @@index([membershipId])
+  @@index([paidAt])
+}
+
+model TierChange {
+  id           String     @id @default(uuid())
+  membershipId String
+  membership   Membership @relation(fields: [membershipId], references: [id])
+  fromTier     Tier
+  toTier       Tier
+  changedById  String
+  createdAt    DateTime   @default(now())
+}
+
+model TierPrice {
+  tier         Tier     @id
+  monthlyPrice Decimal  @db.Decimal(10, 2)
+  currency     String   @default("BOB")
+  updatedAt    DateTime @updatedAt
+}
+
+model GymSettings {
+  id                     Int    @id @default(1)
+  gymName                String @default("Mi Gimnasio")
+  timezone               String @default("America/La_Paz")
+  checkinCooldownMinutes Int    @default(180)
+  insideWindowMinutes    Int    @default(120)
+  defaultCountryCode     String @default("+591")
+}
+
+model Checkin {
+  id        String   @id @default(uuid())
+  memberId  String
+  member    User     @relation(fields: [memberId], references: [id])
+  tier      Tier // snapshot
+  daysLeft  Int // snapshot
+  kioskId   String
+  createdAt DateTime @default(now())
+
+  @@index([memberId, createdAt])
+  @@index([createdAt])
+}
+
+model CheckinAttempt {
+  id        String        @id @default(uuid())
+  memberId  String?
+  member    User?         @relation(fields: [memberId], references: [id])
+  result    CheckinResult
+  kioskId   String?
+  detail    String?
+  createdAt DateTime      @default(now())
+
+  @@index([createdAt])
+}
+
+model Device {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  fcmToken   String   @unique
+  platform   String // android | ios
+  lastSeenAt DateTime @default(now())
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// Idempotency for scheduled notifications [R-25]
+model NotificationLog {
+  id           String           @id @default(uuid())
+  membershipId String
+  type         NotificationType
+  endDate      DateTime         @db.Date
+  sentAt       DateTime         @default(now())
+
+  @@unique([membershipId, type, endDate])
+}

@@ -5,7 +5,7 @@ memberships and payments, and PLUS/PREMIUM members follow training plans.
 
 | Folder | What |
 |---|---|
-| [`backend/`](backend/) | NestJS API + PostgreSQL (Prisma). Scaffolded in D1; D0 only has lint/format tooling. |
+| [`backend/`](backend/) | NestJS API + PostgreSQL (Prisma). |
 | [`mobile/`](mobile/) | Flutter app (Android + iOS), one codebase for every role. |
 | [`docs/`](docs/) | [Plan](docs/PLAN.md), [progress](docs/PROGRESS.md), [decisions](docs/DECISIONS.md), [open questions](docs/OPEN_QUESTIONS.md), [API](docs/API.md). |
 | [`docker-compose.yml`](docker-compose.yml) | Local PostgreSQL 16 (+ optional pgAdmin). |
@@ -53,16 +53,36 @@ user `gym`, password `gym`.
 
 ## 2. Backend
 
-> The NestJS API is created in **D1**. Until then only the lint/format tooling exists.
+NestJS 11 + Prisma 6 + PostgreSQL. Needs the database from step 1.
 
 ```bash
 cd backend
 npm ci
-npm run lint:check       # ESLint (typescript-eslint + Prettier)
-npm run format:check     # Prettier
+cp .env.example .env          # then edit: secrets, SEED_ADMIN_PHONE / SEED_ADMIN_PASSWORD
+npx prisma migrate dev        # apply migrations to the dev DB (also generates the Prisma client)
+npx prisma db seed            # gym settings, placeholder tier prices, first ADMIN (safe to re-run)
+npm run start:dev             # http://localhost:3000/api/v1 (reloads on file changes)
 ```
 
-From D1 on, this section will also list `npm run start:dev`, migrations, seeding and tests.
+| URL | What |
+|---|---|
+| `http://localhost:3000/api/v1/health` | `{"status":"ok","db":"ok"}` when the API and database are up |
+| `http://localhost:3000/api/docs` | Swagger UI (off in production unless `SWAGGER_ENABLED=true`) |
+| `http://localhost:3000/api/docs-json` | OpenAPI document |
+
+Every variable is documented in [`backend/.env.example`](backend/.env.example). The API refuses
+to start if a required variable is missing or invalid, and prints which one.
+
+The seeded admin logs in with `SEED_ADMIN_PHONE` / `SEED_ADMIN_PASSWORD` and must change the
+password on first login (login arrives in D2).
+
+Tests:
+
+```bash
+npm run test                  # unit tests (no database needed)
+npm run test:e2e              # e2e tests against DATABASE_URL_TEST (the gym_test DB);
+                              # migrations are applied and tables emptied automatically
+```
 
 ## 3. Mobile
 
@@ -79,8 +99,8 @@ Environment flavors (`--dart-define=API_BASE_URL=...` for dev/staging/prod) are 
 Run these before every commit (see section 0.8 of the [plan](docs/PLAN.md)):
 
 ```bash
-# Backend (full set from D1 on: lint, test, test:e2e, build)
-cd backend && npm run lint && npm run format:check
+# Backend
+cd backend && npm run lint && npm run test && npm run test:e2e && npm run build
 
 # Mobile
 cd mobile && flutter analyze && flutter test && dart format --set-exit-if-changed .
