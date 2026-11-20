@@ -767,4 +767,159 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsTimezoneHint => 'Set on the server.';
+
+  @override
+  String get dashboardMetricsSoon => 'Gym metrics are coming soon.';
+
+  @override
+  String get dashboardRecentCheckins => 'Latest check-ins';
+
+  @override
+  String get dashboardNoCheckins => 'No check-ins yet.';
+
+  @override
+  String get checkinsInsideTab => 'Inside now';
+
+  @override
+  String checkinsInsideTabCount(int count) {
+    return 'Inside now ($count)';
+  }
+
+  @override
+  String get checkinsTodayTab => 'Today';
+
+  @override
+  String checkinsInsideHint(int minutes) {
+    return 'Checked in during the last $minutes minutes.';
+  }
+
+  @override
+  String get checkinsInsideEmpty => 'Nobody inside right now.';
+
+  @override
+  String get checkinsTodayEmpty => 'No check-ins today yet.';
+
+  @override
+  String get checkinsDenied => 'Denied';
+
+  @override
+  String checkinsDeniedExpired(String date) {
+    return 'membership expired on $date';
+  }
+
+  @override
+  String get checkinsDeniedExpiredShort => 'membership expired';
+
+  @override
+  String get checkinsDeniedInactive => 'account deactivated';
+
+  @override
+  String get checkinsAlertsOn => 'Sound and vibration on';
+
+  @override
+  String get checkinsAlertsOff => 'Sound and vibration off';
+
+  @override
+  String get kioskScanHint => 'Scan with the app to check in';
+
+  @override
+  String get kioskOffline => 'No connection';
+
+  @override
+  String get kioskRetrying => 'Retrying…';
+
+  @override
+  String get kioskExitTitle => 'Leave kiosk mode';
+
+  @override
+  String get kioskExitBody => 'Enter an administrator\'s phone and password.';
+
+  @override
+  String get kioskExitConfirm => 'Leave';
+
+  @override
+  String get kioskExitWrong => 'These are not an administrator\'s credentials.';
+
+  @override
+  String get memberScanButton => 'Scan to check in';
+
+  @override
+  String memberExpiredOn(String date) {
+    return 'Expired on $date';
+  }
+
+  @override
+  String memberCheckinsThisMonth(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count check-ins this month',
+      one: '1 check-in this month',
+      zero: 'No check-ins this month',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scannerTitle => 'Scan QR';
+
+  @override
+  String get scannerTorch => 'Flashlight';
+
+  @override
+  String get scannerHint => 'Point at the QR code at the entrance';
+
+  @override
+  String get scannerSending => 'Checking you in…';
+
+  @override
+  String get scannerExplain =>
+      'To check you in, the app needs the camera to read the QR code at the entrance.';
+
+  @override
+  String get scannerAllowCamera => 'Allow camera';
+
+  @override
+  String get scannerDenied =>
+      'The QR code can\'t be read without the camera. You can allow it now.';
+
+  @override
+  String get scannerBlocked =>
+      'Camera permission is blocked. Turn it on in the phone settings.';
+
+  @override
+  String get scannerOpenSettings => 'Open settings';
+
+  @override
+  String checkinWelcome(String name) {
+    return 'Welcome, $name!';
+  }
+
+  @override
+  String checkinDuplicate(String time) {
+    return 'You already checked in today at $time.';
+  }
+
+  @override
+  String get checkinEnjoy => 'All set, have a great workout!';
+
+  @override
+  String get checkinGoHome => 'Go to home';
+
+  @override
+  String get checkinExpiredTitle => 'Membership expired';
+
+  @override
+  String get checkinExpiredBody =>
+      'Visit the front desk to renew and keep training.';
+
+  @override
+  String get checkinInvalidQr => 'Invalid code, scan again.';
+
+  @override
+  String get checkinScanAgain => 'Scan again';
+
+  @override
+  String get checkinInactive =>
+      'Your account is deactivated. Visit the front desk.';
 }

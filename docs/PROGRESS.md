@@ -9,7 +9,7 @@
 | D4 Mobile foundation | ✅ | 2026-11-19 | Flutter app shell: Riverpod + go_router role redirects, dio client with token refresh, secure session storage, splash/login/change-password/logout, M3 theme, tier badge, state widgets, es/en localization, dev/staging/prod run configs. Verified on an Android emulator against the real backend. |
 | D5 Admin member UI | ✅ | 2026-11-19 | Admin bottom nav; members list (search, filters, paging), new-member stepper with one-time temporary password (copy/share), member detail, renew, tier change, void, edit, reset password, deactivate; Precios, Personal (staff creation), Configuración. Full flow verified on the emulator against the real backend. |
 | D6 Check-in backend | ✅ | 2026-11-19 | Rotating kiosk QR tokens, `POST /checkins` with [R-17]–[R-23] and attempt logging, admin lists (check-ins, inside now, attempts), `/me/checkins`, Socket.IO `/realtime` with JWT handshake and `admins` room. |
-| D7 Check-in mobile | ⬜ | | |
+| D7 Check-in mobile | ✅ | 2026-11-19 | Kiosk QR screen (rotation, offline, wakelock/immersive/portrait, hidden admin exit), member home (membership card, scan button, monthly attendance calendar), scanner with permission flow, every result variant, admin live check-ins (Adentro ahora / Hoy) and a live "last check-ins" dashboard list over Socket.IO. Verified end to end on the emulator against the real backend. |
 | D8 Notifications & scheduler | ⬜ | | |
 | D9 Dashboard & reports | ⬜ | | |
 | D10 v1 hardening & Android release | ⬜ | | |
@@ -146,6 +146,22 @@ Done: the admin can run memberships from the phone. Found and fixed on the way: 
 Done: the secure check-in flow runs on the server and admins get it live. The phone screens
 that use it (kiosk QR, scanner, live feed) are D7.
 
+## D7 — Check-in mobile (kiosk, scanner, live feed)
+
+- [x] Kiosk (9.4): gym name, QR ≥ 60 % of the shorter side, countdown bar, clock, "Escanea con la app para ingresar"; new token every 30 s; offline → "Sin conexión" and never an expired QR; wakelock, immersive mode, portrait; hidden exit (logo 5 s → admin phone + password → logout)
+- [x] Member home (9.5 #1): card with tier badge, days-left ring (green > 7, orange 1–7, red expired), end date; "Escanear para ingresar" (enabled when expired); check-ins this month + mini calendar
+- [x] Scanner (9.5 #2): explain → request → open settings when blocked; frame overlay, torch; on read: vibrate, stop the camera, `POST /checkins`, loading. Android `CAMERA` permission; iOS `NSCameraUsageDescription` (Spanish)
+- [x] Result (9.5 #3): success, duplicate ("Ya registraste tu ingreso hoy a las 18:05"), expired (red, end date), invalid/expired QR (scan again), inactive account, no connection
+- [x] Admin live check-ins (9.3 #7): tabs Adentro ahora / Hoy, new entries animated at the top, denied entries in red with the reason in words, sound + vibration (switch in the app bar, remembered), reload after reconnecting; dashboard "Últimos ingresos" is live; member detail Ingresos tab shows denied attempts
+- [x] Acceptance: the emulator kiosk shows the rotating QR; a member scanning it gets the success screen with days left; the admin socket got the event in 33 ms and the admin feed showed a new entry in 318 ms (integration test, real backend)
+- [x] Acceptance: second scan → "Ya registraste tu ingreso…", no second admin event
+- [x] Acceptance: expired member → red screen; the admin gets `checkin.denied` and sees it in red
+- [x] Acceptance: the first QR scanned after 45 s → "Código no válido"
+- [x] Verification: `flutter analyze` (no issues), `flutter test` (104, incl. every result variant), `dart format --set-exit-if-changed .`; backend gates
+
+Done: check-in works end to end on one emulator playing kiosk, member and admin in turn (the
+camera is replaced by the QR the kiosk screen shows). The two-phone run is in the manual QA list.
+
 ## Manual QA checklists
 
 ### D0
@@ -195,4 +211,14 @@ and payments screens:
 ### D6
 - [x] Built app: Swagger lists `/kiosk/qr-token`, `/checkins`, `/admin/checkins`, `/admin/checkins/inside`, `/admin/checkins/attempts`, `/me/checkins` (31 paths)
 - [x] Built app: Socket.IO answers the handshake; a socket with a bad token gets `unauthorized` and is disconnected
-- [ ] End-to-end with real devices comes with D7 (kiosk + member phones)
+- [x] End-to-end with real devices comes with D7 (kiosk + member phones), see D7
+
+### D7
+Run as `integration_test/checkin_flow_test.dart` on the Pixel 9 emulator against the real backend
+(`gym_test`): kiosk login → QR rotates after 30.4 s → hidden exit with admin credentials →
+member scans the kiosk's QR → success (socket event after 33 ms) → duplicate → expired member
+(red, denial event) → QR older than 45 s rejected → admin Ingresos shows both, and a new
+check-in appears live in 318 ms.
+- [ ] Two physical devices: tablet/phone as kiosk, a real phone camera scanning it, a third (or the kiosk after exit) as admin
+- [ ] Screenshot of the QR scanned after 45 s with a real camera is rejected
+- [ ] Torch and the camera permission dialogs on a real phone

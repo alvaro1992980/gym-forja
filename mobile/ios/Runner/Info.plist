@@ -66,5 +66,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>La cámara se usa para escanear el código QR de la entrada y registrar tu ingreso.</string>
 </dict>
 </plist>

@@ -48,7 +48,7 @@ Live OpenAPI documentation (Swagger) is served by the backend:
 | GET | `/me/membership` | MEMBER | D3 | `{tier, startDate, endDate, daysLeft, status, nextTier, nextTierStartDate, trainer}`. |
 | GET | `/me/payments` | MEMBER | D3 | Own non-voided payments, no notes, paginated. |
 
-| GET | `/kiosk/qr-token` | KIOSK | D6 | `{token, expiresAt, refreshInSeconds: 30}`. JWT signed with `QR_TOKEN_SECRET`, claims `{typ:"checkin", kid, jti, iat, exp}`, valid 45 s [R-18]. |
+| GET | `/kiosk/qr-token` | KIOSK | D6 | `{token, expiresAt, refreshInSeconds: 30, gymName}` (gym name since D7, for the kiosk screen). JWT signed with `QR_TOKEN_SECRET`, claims `{typ:"checkin", kid, jti, iat, exp}`, valid 45 s [R-18]. |
 | POST | `/checkins` | MEMBER | D6 | `{qrToken}` → `200 {result: SUCCESS\|DUPLICATE, duplicate, checkinId, checkedInAt, member:{firstName}, membership:{tier, endDate, daysLeft}, todayWorkout: null}` [R-19]. 400 `QR_TOKEN_INVALID` / `QR_TOKEN_EXPIRED`; 403 `MEMBERSHIP_EXPIRED` (`details.endDate`) / `ACCOUNT_INACTIVE`. Every scan stores a `CheckinAttempt` [R-22]. 10/min per member. |
 | GET | `/admin/checkins` | ADMIN | D6 | `from, to` (gym dates, inclusive), `memberId`, paginated. |
 | GET | `/admin/checkins/inside` | ADMIN | D6 | `{count, windowMinutes, items}`: latest check-in of each member in the last `insideWindowMinutes` [R-23]. |

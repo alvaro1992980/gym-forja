@@ -202,6 +202,98 @@ final class MemberDetailFamily extends $Family
   String toString() => r'memberDetailProvider';
 }
 
+/// The member's last denied entries (Ingresos tab). Reloaded with the
+/// detail.
+
+@ProviderFor(memberDeniedAttempts)
+final memberDeniedAttemptsProvider = MemberDeniedAttemptsFamily._();
+
+/// The member's last denied entries (Ingresos tab). Reloaded with the
+/// detail.
+
+final class MemberDeniedAttemptsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<CheckinAttempt>>,
+          List<CheckinAttempt>,
+          FutureOr<List<CheckinAttempt>>
+        >
+    with
+        $FutureModifier<List<CheckinAttempt>>,
+        $FutureProvider<List<CheckinAttempt>> {
+  /// The member's last denied entries (Ingresos tab). Reloaded with the
+  /// detail.
+  MemberDeniedAttemptsProvider._({
+    required MemberDeniedAttemptsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'memberDeniedAttemptsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$memberDeniedAttemptsHash();
+
+  @override
+  String toString() {
+    return r'memberDeniedAttemptsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<List<CheckinAttempt>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<CheckinAttempt>> create(Ref ref) {
+    final argument = this.argument as String;
+    return memberDeniedAttempts(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is MemberDeniedAttemptsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$memberDeniedAttemptsHash() =>
+    r'bb1b6cdc8809154b73c1ea81135c91e06abe2291';
+
+/// The member's last denied entries (Ingresos tab). Reloaded with the
+/// detail.
+
+final class MemberDeniedAttemptsFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<CheckinAttempt>>, String> {
+  MemberDeniedAttemptsFamily._()
+    : super(
+        retry: null,
+        name: r'memberDeniedAttemptsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  /// The member's last denied entries (Ingresos tab). Reloaded with the
+  /// detail.
+
+  MemberDeniedAttemptsProvider call(String id) =>
+      MemberDeniedAttemptsProvider._(argument: id, from: this);
+
+  @override
+  String toString() => r'memberDeniedAttemptsProvider';
+}
+
 /// Period and suggested amount for a new member.
 
 @ProviderFor(newMemberPreview)

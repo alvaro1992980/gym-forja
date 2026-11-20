@@ -137,12 +137,16 @@ class AdminHarness {
     when(admin.prices).thenAnswer((_) async => prices);
     when(() => device.copy(any())).thenAnswer((_) async {});
     when(() => device.share(any())).thenAnswer((_) async {});
+    when(device.alert).thenAnswer((_) async {});
   }
 
   final auth = MockAuthRepository();
   final members = MockMembersRepository();
   final admin = MockGymAdminRepository();
   final device = MockDeviceActions();
+  final checkins = emptyCheckins();
+  final realtime = FakeRealtime();
+  final preferences = FakePreferences();
 
   /// Starts the app signed in as an admin and opens [location].
   Future<void> open(WidgetTester tester, String location) async {
@@ -150,6 +154,9 @@ class AdminHarness {
       tester,
       repo: auth,
       storage: MemoryTokenStorage(storedTokens),
+      checkins: checkins,
+      realtime: realtime,
+      preferences: preferences,
       overrides: <Override>[
         membersRepositoryProvider.overrideWithValue(members),
         gymAdminRepositoryProvider.overrideWithValue(admin),

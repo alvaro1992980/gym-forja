@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../features/admin/checkins/presentation/live_checkins_screen.dart';
 import '../../features/admin/members/presentation/edit_member_screen.dart';
 import '../../features/admin/members/presentation/member_detail_screen.dart';
 import '../../features/admin/members/presentation/members_list_screen.dart';
@@ -19,6 +20,9 @@ import '../../features/auth/presentation/change_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/splash_screen.dart';
 import '../../features/kiosk/presentation/kiosk_home_screen.dart';
+import '../../features/member/checkin/domain/checkin_result.dart';
+import '../../features/member/checkin/presentation/checkin_result_screen.dart';
+import '../../features/member/checkin/presentation/scanner_screen.dart';
 import '../../features/member/home/presentation/member_home_screen.dart';
 import '../../features/trainer/presentation/trainer_home_screen.dart';
 import '../auth/session_controller.dart';
@@ -98,7 +102,20 @@ GoRouter router(Ref ref) {
         path: Routes.trainer,
         builder: (_, _) => const TrainerHomeScreen(),
       ),
-      GoRoute(path: Routes.member, builder: (_, _) => const MemberHomeScreen()),
+      GoRoute(
+        path: Routes.member,
+        builder: (_, _) => const MemberHomeScreen(),
+        routes: [
+          GoRoute(path: 'scan', builder: (_, _) => const ScannerScreen()),
+          GoRoute(
+            path: 'checkin-result',
+            redirect: (_, state) =>
+                state.extra is CheckinOutcome ? null : Routes.member,
+            builder: (_, state) =>
+                CheckinResultScreen(outcome: state.extra! as CheckinOutcome),
+          ),
+        ],
+      ),
       GoRoute(path: Routes.kiosk, builder: (_, _) => const KioskHomeScreen()),
     ],
   );
@@ -155,7 +172,7 @@ List<RouteBase> _adminRoutes() => [
         routes: [
           GoRoute(
             path: '/admin/checkins',
-            builder: (_, _) => ComingSoonScreen(title: (l) => l.navCheckins),
+            builder: (_, _) => const LiveCheckinsScreen(),
           ),
         ],
       ),

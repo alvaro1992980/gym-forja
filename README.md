@@ -148,6 +148,12 @@ flutter test integration_test -d emulator-5554 --dart-define-from-file=config/de
   --dart-define=QA_ADMIN_PHONE=70000000 --dart-define=QA_ADMIN_PASSWORD=QaSeed1234
 ```
 
+`integration_test/checkin_flow_test.dart` (D7) runs the check-in flow on one device playing
+kiosk, member and admin in turn: it creates a kiosk and members through the API, reads the QR
+from the kiosk screen and feeds it to the member scanner (no camera needed), and checks the
+admin socket and the live screen. Run one file at a time (`flutter test
+integration_test/<file>.dart ...`), clearing the app's data before each run.
+
 ## 4. Quality gates
 
 Run these before every commit (see section 0.8 of the [plan](docs/PLAN.md)):

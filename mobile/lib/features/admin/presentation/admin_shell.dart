@@ -1,18 +1,21 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../core/widgets/state_views.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../checkins/presentation/live_checkins_providers.dart';
 
 /// Admin bottom navigation (section 9.2): Dashboard · Socios · Ingresos ·
-/// Planes · Más.
-class AdminShell extends StatelessWidget {
+/// Planes · Más. While it is shown, live check-ins play the alert.
+class AdminShell extends ConsumerWidget {
   const AdminShell({super.key, required this.shell});
 
   final StatefulNavigationShell shell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(checkinAlertsProvider);
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: shell,
@@ -33,6 +36,7 @@ class AdminShell extends StatelessWidget {
             label: l10n.navMembers,
           ),
           NavigationDestination(
+            key: const Key('nav.checkins'),
             icon: const Icon(Icons.login_outlined),
             selectedIcon: const Icon(Icons.login),
             label: l10n.navCheckins,
@@ -54,7 +58,7 @@ class AdminShell extends StatelessWidget {
   }
 }
 
-/// Tabs whose screens come in later deliverables (check-ins D7, plans D11).
+/// Tabs whose screens come in later deliverables (plans D11).
 class ComingSoonScreen extends StatelessWidget {
   const ComingSoonScreen({super.key, required this.title});
 

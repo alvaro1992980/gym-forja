@@ -16,6 +16,10 @@ enum Tier {
 
   /// Value for query parameters and request bodies.
   String get api => name.toUpperCase();
+
+  /// `BASIC` → [Tier.basic] (for payloads parsed by hand, e.g. sockets).
+  static Tier fromApi(String value) =>
+      values.firstWhere((t) => t.api == value, orElse: () => Tier.basic);
 }
 
 /// Date-derived membership status computed by the API ([R-01]–[R-03]).

@@ -5,8 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 part 'device_actions.g.dart';
 
-/// Platform side effects (clipboard, share sheet, calls, WhatsApp) behind one
-/// interface so widget tests can replace them.
+/// Platform side effects (clipboard, share sheet, calls, WhatsApp, haptics)
+/// behind one interface so widget tests can replace them.
 class DeviceActions {
   const DeviceActions();
 
@@ -24,6 +24,15 @@ class DeviceActions {
     Uri.https('wa.me', '/${phone.replaceAll('+', '')}', {'text': ?text}),
     mode: LaunchMode.externalApplication,
   );
+
+  /// Short vibration (e.g. a QR was read).
+  Future<void> vibrate() => HapticFeedback.mediumImpact();
+
+  /// Short sound and vibration for a new live check-in (section 9.3 #7).
+  Future<void> alert() async {
+    await SystemSound.play(SystemSoundType.alert);
+    await HapticFeedback.vibrate();
+  }
 }
 
 @Riverpod(keepAlive: true)

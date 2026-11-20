@@ -165,7 +165,9 @@ void main() {
       ).called(1);
       expect(find.byType(AdminHomeScreen), findsOneWidget);
 
-      await tester.tap(find.byTooltip(en.logout));
+      await tester.tap(find.byKey(const Key('nav.more')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(en.logout));
       await tester.pumpAndSettle();
       verify(() => repo.logout('refresh')).called(1);
       expect(storage.tokens, isNull);

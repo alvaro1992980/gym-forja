@@ -6,7 +6,8 @@ plugins {
 
 android {
     namespace = "com.example.gym_app"
-    compileSdk = flutter.compileSdkVersion
+    // permission_handler 13 needs API 37 to compile (targetSdk stays Flutter's default).
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

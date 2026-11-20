@@ -1411,6 +1411,264 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Se configura en el servidor.'**
   String get settingsTimezoneHint;
+
+  /// No description provided for @dashboardMetricsSoon.
+  ///
+  /// In es, this message translates to:
+  /// **'Las métricas del gimnasio llegan pronto.'**
+  String get dashboardMetricsSoon;
+
+  /// No description provided for @dashboardRecentCheckins.
+  ///
+  /// In es, this message translates to:
+  /// **'Últimos ingresos'**
+  String get dashboardRecentCheckins;
+
+  /// No description provided for @dashboardNoCheckins.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay ingresos.'**
+  String get dashboardNoCheckins;
+
+  /// No description provided for @checkinsInsideTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Adentro ahora'**
+  String get checkinsInsideTab;
+
+  /// No description provided for @checkinsInsideTabCount.
+  ///
+  /// In es, this message translates to:
+  /// **'Adentro ahora ({count})'**
+  String checkinsInsideTabCount(int count);
+
+  /// No description provided for @checkinsTodayTab.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoy'**
+  String get checkinsTodayTab;
+
+  /// No description provided for @checkinsInsideHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresaron en los últimos {minutes} minutos.'**
+  String checkinsInsideHint(int minutes);
+
+  /// No description provided for @checkinsInsideEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Nadie adentro ahora.'**
+  String get checkinsInsideEmpty;
+
+  /// No description provided for @checkinsTodayEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay ingresos hoy.'**
+  String get checkinsTodayEmpty;
+
+  /// No description provided for @checkinsDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Rechazado'**
+  String get checkinsDenied;
+
+  /// No description provided for @checkinsDeniedExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'membresía vencida el {date}'**
+  String checkinsDeniedExpired(String date);
+
+  /// No description provided for @checkinsDeniedExpiredShort.
+  ///
+  /// In es, this message translates to:
+  /// **'membresía vencida'**
+  String get checkinsDeniedExpiredShort;
+
+  /// No description provided for @checkinsDeniedInactive.
+  ///
+  /// In es, this message translates to:
+  /// **'cuenta desactivada'**
+  String get checkinsDeniedInactive;
+
+  /// No description provided for @checkinsAlertsOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Sonido y vibración activados'**
+  String get checkinsAlertsOn;
+
+  /// No description provided for @checkinsAlertsOff.
+  ///
+  /// In es, this message translates to:
+  /// **'Sonido y vibración desactivados'**
+  String get checkinsAlertsOff;
+
+  /// No description provided for @kioskScanHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Escanea con la app para ingresar'**
+  String get kioskScanHint;
+
+  /// No description provided for @kioskOffline.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin conexión'**
+  String get kioskOffline;
+
+  /// No description provided for @kioskRetrying.
+  ///
+  /// In es, this message translates to:
+  /// **'Reintentando…'**
+  String get kioskRetrying;
+
+  /// No description provided for @kioskExitTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir del modo kiosco'**
+  String get kioskExitTitle;
+
+  /// No description provided for @kioskExitBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa el teléfono y la contraseña de un administrador.'**
+  String get kioskExitBody;
+
+  /// No description provided for @kioskExitConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir'**
+  String get kioskExitConfirm;
+
+  /// No description provided for @kioskExitWrong.
+  ///
+  /// In es, this message translates to:
+  /// **'No son credenciales de un administrador.'**
+  String get kioskExitWrong;
+
+  /// No description provided for @memberScanButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Escanear para ingresar'**
+  String get memberScanButton;
+
+  /// No description provided for @memberExpiredOn.
+  ///
+  /// In es, this message translates to:
+  /// **'Venció el {date}'**
+  String memberExpiredOn(String date);
+
+  /// No description provided for @memberCheckinsThisMonth.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{Sin ingresos este mes} =1{1 ingreso este mes} other{{count} ingresos este mes}}'**
+  String memberCheckinsThisMonth(int count);
+
+  /// No description provided for @scannerTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Escanear QR'**
+  String get scannerTitle;
+
+  /// No description provided for @scannerTorch.
+  ///
+  /// In es, this message translates to:
+  /// **'Linterna'**
+  String get scannerTorch;
+
+  /// No description provided for @scannerHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Apunta al código QR de la entrada'**
+  String get scannerHint;
+
+  /// No description provided for @scannerSending.
+  ///
+  /// In es, this message translates to:
+  /// **'Registrando tu ingreso…'**
+  String get scannerSending;
+
+  /// No description provided for @scannerExplain.
+  ///
+  /// In es, this message translates to:
+  /// **'Para registrar tu ingreso, la app necesita usar la cámara y leer el código QR de la entrada.'**
+  String get scannerExplain;
+
+  /// No description provided for @scannerAllowCamera.
+  ///
+  /// In es, this message translates to:
+  /// **'Permitir cámara'**
+  String get scannerAllowCamera;
+
+  /// No description provided for @scannerDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin la cámara no se puede leer el código QR. Puedes permitirla ahora.'**
+  String get scannerDenied;
+
+  /// No description provided for @scannerBlocked.
+  ///
+  /// In es, this message translates to:
+  /// **'El permiso de la cámara está bloqueado. Actívalo en la configuración del teléfono.'**
+  String get scannerBlocked;
+
+  /// No description provided for @scannerOpenSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir configuración'**
+  String get scannerOpenSettings;
+
+  /// No description provided for @checkinWelcome.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Bienvenido, {name}!'**
+  String checkinWelcome(String name);
+
+  /// No description provided for @checkinDuplicate.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya registraste tu ingreso hoy a las {time}.'**
+  String checkinDuplicate(String time);
+
+  /// No description provided for @checkinEnjoy.
+  ///
+  /// In es, this message translates to:
+  /// **'Listo, ¡buen entrenamiento!'**
+  String get checkinEnjoy;
+
+  /// No description provided for @checkinGoHome.
+  ///
+  /// In es, this message translates to:
+  /// **'Ir al inicio'**
+  String get checkinGoHome;
+
+  /// No description provided for @checkinExpiredTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Membresía vencida'**
+  String get checkinExpiredTitle;
+
+  /// No description provided for @checkinExpiredBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Acércate a recepción para renovar y seguir entrenando.'**
+  String get checkinExpiredBody;
+
+  /// No description provided for @checkinInvalidQr.
+  ///
+  /// In es, this message translates to:
+  /// **'Código no válido, vuelve a escanear.'**
+  String get checkinInvalidQr;
+
+  /// No description provided for @checkinScanAgain.
+  ///
+  /// In es, this message translates to:
+  /// **'Escanear de nuevo'**
+  String get checkinScanAgain;
+
+  /// No description provided for @checkinInactive.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu cuenta está desactivada. Acércate a recepción.'**
+  String get checkinInactive;
 }
 
 class _AppLocalizationsDelegate

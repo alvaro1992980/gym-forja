@@ -24,7 +24,10 @@ class AppConfig {
   final String apiBaseUrl;
 
   /// Base URL of every REST call (`/api/v1`, docs/PLAN.md section 8).
-  String get apiUrl => '${_trimTrailingSlash(apiBaseUrl)}/api/v1';
+  String get apiUrl => '$apiOrigin/api/v1';
+
+  /// Server origin for Socket.IO (`<origin>/realtime`, section 8.5).
+  String get apiOrigin => _trimTrailingSlash(apiBaseUrl);
 
   bool get isProduction => environment == 'prod';
 

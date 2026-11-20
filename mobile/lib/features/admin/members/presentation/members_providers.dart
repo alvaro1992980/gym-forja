@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/models/enums.dart';
+import '../../checkins/data/checkins_repository.dart';
+import '../../checkins/domain/checkin_models.dart';
 import '../data/members_repository.dart';
 import '../domain/member_models.dart';
 
@@ -81,6 +83,17 @@ class MembersList extends _$MembersList {
 @riverpod
 Future<MemberDetail> memberDetail(Ref ref, String id) =>
     ref.watch(membersRepositoryProvider).detail(id);
+
+/// The member's last denied entries (Ingresos tab). Reloaded with the
+/// detail.
+@riverpod
+Future<List<CheckinAttempt>> memberDeniedAttempts(Ref ref, String id) async {
+  await ref.watch(memberDetailProvider(id).future);
+  final page = await ref
+      .read(checkinsRepositoryProvider)
+      .attempts(memberId: id, pageSize: 20);
+  return page.items.where((a) => a.isDenied).take(10).toList();
+}
 
 /// Period and suggested amount for a new member.
 @riverpod

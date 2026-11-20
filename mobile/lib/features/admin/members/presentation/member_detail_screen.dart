@@ -12,6 +12,7 @@ import '../../../../core/widgets/dialogs.dart';
 import '../../../../core/widgets/state_views.dart';
 import '../../../../core/widgets/tier_badge.dart';
 import '../../../../l10n/generated/app_localizations.dart';
+import '../../checkins/domain/checkin_models.dart';
 import '../../shared/labels.dart';
 import '../../shared/member_status_label.dart';
 import '../../shared/temporary_password_screen.dart';
@@ -345,29 +346,53 @@ class PaymentTile extends StatelessWidget {
   }
 }
 
-class _CheckinsTab extends StatelessWidget {
+/// Last check-ins and denied attempts (in red), newest first.
+class _CheckinsTab extends ConsumerWidget {
   const _CheckinsTab({required this.member});
 
   final MemberDetail member;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
-    if (member.recentCheckins.isEmpty) {
-      return ListView(
-        children: [EmptyView(message: l10n.checkinsEmpty, icon: Icons.login)],
-      );
-    }
-    return ListView(
-      children: [
-        for (final c in member.recentCheckins)
+    final error = Theme.of(context).colorScheme.error;
+    final denied = ref.watch(memberDeniedAttemptsProvider(member.id)).value;
+    final rows = <(String, Widget)>[
+      for (final c in member.recentCheckins)
+        (
+          c.createdAt,
           ListTile(
             leading: const Icon(Icons.login),
             title: Text(formatInstant(c.createdAt)),
             trailing: TierBadge(c.tier),
           ),
-      ],
-    );
+        ),
+      for (final a in denied ?? const <CheckinAttempt>[])
+        (
+          a.createdAt,
+          ListTile(
+            leading: Icon(Icons.block, color: error),
+            title: Text(
+              formatInstant(a.createdAt),
+              style: TextStyle(color: error),
+            ),
+            subtitle: Text(
+              '${l10n.checkinsDenied} · ${switch (a) {
+                CheckinAttempt(result: CheckinResult.deniedInactive) => l10n.checkinsDeniedInactive,
+                CheckinAttempt(:final endDate?) => l10n.checkinsDeniedExpired(formatApiDate(endDate)),
+                _ => l10n.checkinsDeniedExpiredShort,
+              }}',
+              style: TextStyle(color: error),
+            ),
+          ),
+        ),
+    ]..sort((a, b) => b.$1.compareTo(a.$1));
+    if (rows.isEmpty) {
+      return ListView(
+        children: [EmptyView(message: l10n.checkinsEmpty, icon: Icons.login)],
+      );
+    }
+    return ListView(children: [for (final r in rows) r.$2]);
   }
 }
 

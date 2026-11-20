@@ -125,6 +125,7 @@ describe('Check-in, kiosk QR and realtime (e2e)', () => {
         token: expect.any(String),
         expiresAt: '2026-11-19T16:00:45.000Z',
         refreshInSeconds: 30,
+        gymName: expect.any(String),
       });
     });
 

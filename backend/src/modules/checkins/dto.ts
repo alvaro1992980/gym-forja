@@ -56,6 +56,8 @@ export class QrTokenDto {
   @ApiProperty() token: string;
   @ApiProperty() expiresAt: Date;
   @ApiProperty({ example: 30 }) refreshInSeconds: number;
+  @ApiProperty({ example: 'Mi Gimnasio', description: 'Shown on the kiosk screen.' })
+  gymName: string;
 }
 
 export class CheckinMembershipDto {

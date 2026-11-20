@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 final _apiDate = DateFormat('yyyy-MM-dd');
 final _displayDate = DateFormat('dd/MM/yyyy');
 final _displayDateTime = DateFormat('dd/MM/yyyy HH:mm');
+final _displayTime = DateFormat('HH:mm');
 
 /// `2026-12-14` (gym-local date from the API) → `14/12/2026`.
 /// Parsed without time zones, so the calendar day never shifts.
@@ -28,3 +29,7 @@ int daysBetween(DateTime from, DateTime to) => DateTime.utc(
   to.month,
   to.day,
 ).difference(DateTime.utc(from.year, from.month, from.day)).inDays;
+
+/// API instant → `18:05` in device time.
+String formatTime(String isoInstant) =>
+    _displayTime.format(DateTime.parse(isoInstant).toLocal());
