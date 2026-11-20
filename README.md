@@ -151,7 +151,8 @@ flutter test integration_test -d emulator-5554 --dart-define-from-file=config/de
 `integration_test/checkin_flow_test.dart` (D7) runs the check-in flow on one device playing
 kiosk, member and admin in turn: it creates a kiosk and members through the API, reads the QR
 from the kiosk screen and feeds it to the member scanner (no camera needed), and checks the
-admin socket and the live screen. Run one file at a time (`flutter test
+admin socket and the live screen. `integration_test/notifications_flow_test.dart` (D8) checks the
+inbox, bell and notification taps (backend with `PUSH_ENABLED=false`). Run one file at a time (`flutter test
 integration_test/<file>.dart ...`), clearing the app's data before each run.
 
 ## 4. Quality gates
@@ -170,4 +171,5 @@ cd mobile && flutter analyze && flutter test && dart format --set-exit-if-change
 
 Development follows [`docs/PLAN.md`](docs/PLAN.md), one deliverable at a time. Progress is tracked
 in [`docs/PROGRESS.md`](docs/PROGRESS.md). Never commit `.env` files, keystores or Firebase config
-files; they are git-ignored.
+files; they are git-ignored. Push notifications stay off until the Firebase files are added, as
+described in [`docs/FIREBASE_SETUP.md`](docs/FIREBASE_SETUP.md).

@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../core/widgets/async_view.dart';
 import '../../../l10n/generated/app_localizations.dart';
+import '../../notifications/presentation/notification_bell.dart';
 import '../checkins/presentation/live_checkins_providers.dart';
 import '../checkins/presentation/live_checkins_screen.dart';
 
@@ -20,7 +21,10 @@ class AdminHomeScreen extends ConsumerWidget {
         ref.read(recentCheckinsProvider.notifier).refresh();
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.navDashboard)),
+      appBar: AppBar(
+        title: Text(l10n.navDashboard),
+        actions: const [NotificationBell()],
+      ),
       body: RefreshIndicator(
         onRefresh: refresh,
         child: ListView(

@@ -55,6 +55,12 @@ Live OpenAPI documentation (Swagger) is served by the backend:
 | GET | `/admin/checkins/attempts` | ADMIN | D6 | Denied and invalid attempts by default; `result=` for one result; `from, to, memberId`, paginated. |
 | GET | `/me/checkins` | MEMBER | D6 | Own check-ins `{id, tier, createdAt}`, `from, to`, paginated. |
 
+| POST | `/me/devices` | any | D8 | `{fcmToken, platform: android\|ios}` → 204. Upsert by token (a token moves to the user who registers it). |
+| DELETE | `/me/devices/:fcmToken` | any | D8 | 204; only the caller's own device. Logout with `fcmToken` does the same. |
+| GET | `/me/notifications` | any | D8 | Inbox, newest first, paginated, plus `unreadCount`. Items `{id, type, title, body, data, readAt, createdAt}`; `data` has `screen` and/or `memberId`. |
+| POST | `/me/notifications/:id/read` · `/me/notifications/read-all` | any | D8 | 204; another user's id → 404. |
+| POST | `/admin/jobs/:name/run` | ADMIN | D8 | `daily-expiry` → `{date, sent: {EXPIRING_7, EXPIRING_3, EXPIRING_1, EXPIRED_MEMBER}, skipped, adminSummary}`; `nightly-sessions` → `{finished, deleted}` (no-op until D12). 404 in production. |
+
 Money is sent as a JSON number (≤ 2 decimals) and returned as a string (`"150.00"`).
 
 ## Realtime (D6)
@@ -70,6 +76,17 @@ Socket.IO namespace **`/realtime`** on the API host (e.g. `http://10.0.2.2:3000/
     (not sent for duplicates [R-19]);
   - **`checkin.denied`** `{member: {id, firstName, lastName}, reason: EXPIRED|INACTIVE, endDate, createdAt}`.
 - On reconnect, clients reload `GET /admin/checkins/inside` to fill any gap (section 8.5).
+
+## Notifications (D8)
+
+Every notification of PLAN section 7 is stored for the inbox and pushed (FCM) to the user's
+devices after the request's transaction, in the background: a push failure never fails a
+request. Invalid tokens reported by FCM are deleted. `PUSH_ENABLED=false` stores and logs only.
+Push `data` = the notification's `data` plus `type` and `notificationId`.
+
+Scheduled jobs (gym timezone): `daily-expiry` at 08:00 [R-24]–[R-26] (idempotent through
+`NotificationLog`), `nightly-sessions` at 23:59 [R-30]. Firebase setup:
+[FIREBASE_SETUP.md](FIREBASE_SETUP.md).
 
 **Auth rules (D2):** every endpoint needs `Authorization: Bearer <accessToken>` unless marked
 public. While `mustChangePassword` is true, every endpoint except change-password, logout and

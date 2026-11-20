@@ -47,7 +47,7 @@ final class SessionControllerProvider
   }
 }
 
-String _$sessionControllerHash() => r'ae1206a86ab9a4cf7e044ef44f99d9eb21374302';
+String _$sessionControllerHash() => r'42c8acc3feb074e4ba53593775eafd93c9fec312';
 
 /// Owns the session: restores it at launch, signs in and out, and is told by
 /// the HTTP client when the refresh token is rejected.

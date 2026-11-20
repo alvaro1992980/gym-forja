@@ -23,6 +23,9 @@ class MemberFiltersController extends _$MemberFiltersController {
 
   void toggleTier(Tier tier) =>
       state = state.copyWith(tier: state.tier == tier ? null : tier);
+
+  /// Only [status] (e.g. from the expiring-members notification).
+  void show(MemberStatusFilter status) => state = MemberFilters(status: status);
 }
 
 class MembersListState {

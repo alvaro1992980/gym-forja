@@ -1669,6 +1669,60 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Tu cuenta está desactivada. Acércate a recepción.'**
   String get checkinInactive;
+
+  /// No description provided for @notificationsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Notificaciones'**
+  String get notificationsTitle;
+
+  /// No description provided for @notificationsUnread.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 notificación sin leer} other{{count} notificaciones sin leer}}'**
+  String notificationsUnread(int count);
+
+  /// No description provided for @notificationsUnreadLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin leer'**
+  String get notificationsUnreadLabel;
+
+  /// No description provided for @notificationsReadAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Marcar todo como leído'**
+  String get notificationsReadAll;
+
+  /// No description provided for @notificationsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No tienes notificaciones.'**
+  String get notificationsEmpty;
+
+  /// No description provided for @pushExplainTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Activa las notificaciones'**
+  String get pushExplainTitle;
+
+  /// No description provided for @pushExplainBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Te avisaremos cuando tu membresía esté por vencer, cuando registres tu ingreso y cuando haya novedades del gimnasio.'**
+  String get pushExplainBody;
+
+  /// No description provided for @pushExplainEnable.
+  ///
+  /// In es, this message translates to:
+  /// **'Activar'**
+  String get pushExplainEnable;
+
+  /// No description provided for @pushExplainLater.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahora no'**
+  String get pushExplainLater;
 }
 
 class _AppLocalizationsDelegate

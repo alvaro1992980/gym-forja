@@ -287,5 +287,15 @@
   "checkinExpiredBody": "Visit the front desk to renew and keep training.",
   "checkinInvalidQr": "Invalid code, scan again.",
   "checkinScanAgain": "Scan again",
-  "checkinInactive": "Your account is deactivated. Visit the front desk."
+  "checkinInactive": "Your account is deactivated. Visit the front desk.",
+
+  "notificationsTitle": "Notifications",
+  "notificationsUnread": "{count, plural, =1{1 unread notification} other{{count} unread notifications}}",
+  "notificationsUnreadLabel": "Unread",
+  "notificationsReadAll": "Mark all as read",
+  "notificationsEmpty": "You have no notifications.",
+  "pushExplainTitle": "Turn on notifications",
+  "pushExplainBody": "We'll let you know when your membership is about to expire, when you check in, and when there is news from the gym.",
+  "pushExplainEnable": "Turn on",
+  "pushExplainLater": "Not now"
 }

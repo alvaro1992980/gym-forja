@@ -46,4 +46,4 @@ final class MemberHomeProvider
   }
 }
 
-String _$memberHomeHash() => r'1df2091b495d7f8e1856ebbe51d6ba11ddacf4f0';
+String _$memberHomeHash() => r'b58f2bfcac655af7ebef4a11ca5455edc7e49598';

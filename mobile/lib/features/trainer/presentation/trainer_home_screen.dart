@@ -13,6 +13,7 @@ class TrainerHomeScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return RoleHomeScaffold(
       title: l10n.homeTrainerTitle,
+      showBell: true,
       body: GreetingPlaceholder(roleLabel: l10n.roleTrainer),
     );
   }

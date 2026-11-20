@@ -3,12 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gym_app/core/auth/token_storage.dart';
 import 'package:gym_app/core/models/enums.dart';
 import 'package:gym_app/core/models/paginated.dart';
+import 'package:gym_app/core/push/push_service.dart';
 import 'package:gym_app/core/utils/clock.dart';
 import 'package:gym_app/core/utils/device_actions.dart';
 import 'package:gym_app/features/admin/members/data/members_repository.dart';
 import 'package:gym_app/features/admin/members/domain/member_models.dart';
 import 'package:gym_app/features/admin/settings/data/gym_admin_repository.dart';
 import 'package:gym_app/features/auth/domain/current_user.dart';
+import 'package:gym_app/features/notifications/data/notifications_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'fakes.dart';
@@ -148,8 +150,14 @@ class AdminHarness {
   final realtime = FakeRealtime();
   final preferences = FakePreferences();
 
-  /// Starts the app signed in as an admin and opens [location].
-  Future<void> open(WidgetTester tester, String location) async {
+  /// Starts the app signed in as an admin and opens [location] (null: stay
+  /// where the app lands).
+  Future<void> open(
+    WidgetTester tester,
+    String? location, {
+    PushService? push,
+    NotificationsRepository? notifications,
+  }) async {
     await pumpGymApp(
       tester,
       repo: auth,
@@ -157,6 +165,8 @@ class AdminHarness {
       checkins: checkins,
       realtime: realtime,
       preferences: preferences,
+      push: push,
+      notifications: notifications,
       overrides: <Override>[
         membersRepositoryProvider.overrideWithValue(members),
         gymAdminRepositoryProvider.overrideWithValue(admin),
@@ -164,6 +174,6 @@ class AdminHarness {
         clockProvider.overrideWithValue(testClock),
       ],
     );
-    await goTo(tester, location);
+    if (location != null) await goTo(tester, location);
   }
 }

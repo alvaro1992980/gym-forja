@@ -9,6 +9,7 @@ import 'package:gym_app/core/auth/token_storage.dart';
 import 'package:gym_app/core/models/enums.dart';
 import 'package:gym_app/core/models/paginated.dart';
 import 'package:gym_app/core/network/api_exception.dart';
+import 'package:gym_app/core/push/push_service.dart';
 import 'package:gym_app/core/realtime/realtime_client.dart';
 import 'package:gym_app/core/router/app_router.dart';
 import 'package:gym_app/core/utils/preferences.dart';
@@ -19,6 +20,8 @@ import 'package:gym_app/features/auth/domain/current_user.dart';
 import 'package:gym_app/features/kiosk/data/kiosk_repository.dart';
 import 'package:gym_app/features/kiosk/presentation/kiosk_controller.dart';
 import 'package:gym_app/features/member/data/member_repository.dart';
+import 'package:gym_app/features/notifications/data/notifications_repository.dart';
+import 'package:gym_app/features/notifications/domain/app_notification.dart';
 import 'package:gym_app/l10n/generated/app_localizations.dart';
 import 'package:gym_app/main.dart' show noRetry;
 import 'package:material_ui/material_ui.dart';
@@ -31,6 +34,89 @@ class MockCheckinsRepository extends Mock implements CheckinsRepository {}
 class MockMemberRepository extends Mock implements MemberRepository {}
 
 class MockKioskRepository extends Mock implements KioskRepository {}
+
+class MockNotificationsRepository extends Mock
+    implements NotificationsRepository {}
+
+/// Push on a device: the test controls permission, token and messages.
+class FakePushService implements PushService {
+  FakePushService({
+    this.available = true,
+    this.permissionStatus = PushPermission.notDetermined,
+    this.grantOnRequest = true,
+    this.fcmToken = 'fcm-token-1',
+    this.launch,
+  });
+
+  @override
+  bool available;
+  PushPermission permissionStatus;
+  bool grantOnRequest;
+  String? fcmToken;
+  Map<String, String>? launch;
+  int permissionRequests = 0;
+  final banners = <PushMessage>[];
+  final refresh = StreamController<String>.broadcast();
+  final foregroundCtrl = StreamController<PushMessage>.broadcast();
+  final openedCtrl = StreamController<Map<String, String>>.broadcast();
+
+  @override
+  Future<void> init() async {}
+  @override
+  Future<PushPermission> permission() async => permissionStatus;
+  @override
+  Future<PushPermission> requestPermission() async {
+    permissionRequests++;
+    return permissionStatus = grantOnRequest
+        ? PushPermission.granted
+        : PushPermission.denied;
+  }
+
+  @override
+  Future<String?> token() async => fcmToken;
+  @override
+  Stream<String> get tokenRefresh => refresh.stream;
+  @override
+  Stream<PushMessage> get foreground => foregroundCtrl.stream;
+  @override
+  Stream<Map<String, String>> get opened => openedCtrl.stream;
+  @override
+  Future<Map<String, String>?> launchData() async => launch;
+  @override
+  Future<void> showBanner(PushMessage message) async => banners.add(message);
+  @override
+  String get platform => 'android';
+
+  Future<void> close() async {
+    await refresh.close();
+    await foregroundCtrl.close();
+    await openedCtrl.close();
+  }
+}
+
+/// Inbox API with [items] (all unread unless `readAt` is set).
+MockNotificationsRepository inboxWith([
+  List<AppNotification> items = const [],
+]) {
+  final repo = MockNotificationsRepository();
+  when(
+    () => repo.inbox(
+      page: any(named: 'page'),
+      size: any(named: 'size'),
+    ),
+  ).thenAnswer(
+    (_) async => InboxPage(
+      items: items,
+      page: 1,
+      hasMore: false,
+      unreadCount: items.where((n) => !n.isRead).length,
+    ),
+  );
+  when(() => repo.markRead(any())).thenAnswer((_) async {});
+  when(repo.markAllRead).thenAnswer((_) async {});
+  when(() => repo.registerDevice(any(), any())).thenAnswer((_) async {});
+  return repo;
+}
 
 /// In-memory [Preferences].
 class FakePreferences implements Preferences {
@@ -170,6 +256,8 @@ Future<void> pumpGymApp(
   KioskRepository? kiosk,
   KioskDisplay? kioskDisplay,
   Preferences? preferences,
+  PushService? push,
+  NotificationsRepository? notifications,
 }) async {
   await tester.pumpWidget(
     ProviderScope(
@@ -190,6 +278,12 @@ Future<void> pumpGymApp(
           kioskDisplay ?? FakeKioskDisplay(),
         ),
         preferencesProvider.overrideWithValue(preferences ?? FakePreferences()),
+        pushServiceProvider.overrideWithValue(
+          push ?? const DisabledPushService(),
+        ),
+        notificationsRepositoryProvider.overrideWithValue(
+          notifications ?? inboxWith(),
+        ),
         ...overrides,
       ],
       child: const GymApp(),

@@ -18,6 +18,13 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { personRef } from '../memberships/mappers';
 import { MembershipsService } from '../memberships/memberships.service';
 import { QrTokenError, QrTokenService } from '../kiosk/qr-token.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import {
+  checkinAdmin,
+  checkinDeniedAdmin,
+  checkinDeniedMember,
+  checkinMember,
+} from '../notifications/templates';
 import { RealtimeGateway } from '../realtime/realtime.gateway';
 import { SettingsService } from '../settings/settings.controller';
 import { insideSince, isDuplicateCheckin } from './checkin-rules';
@@ -58,6 +65,7 @@ export class CheckinsService {
     private readonly memberships: MembershipsService,
     private readonly settings: SettingsService,
     private readonly realtime: RealtimeGateway,
+    private readonly notifications: NotificationsService,
   ) {}
 
   /**
@@ -142,6 +150,9 @@ export class CheckinsService {
 
     if (outcome.kind === 'expired') {
       this.realtime.checkinDenied({ member, reason: 'EXPIRED', endDate, createdAt: now });
+      // [R-20] Both the admins and the member are notified (section 7).
+      this.notifications.notifyAdmins(checkinDeniedAdmin(member, endDate));
+      this.notifications.notify([user.id], checkinDeniedMember(endDate));
       throw new AppException(HttpStatus.FORBIDDEN, ErrorCode.MEMBERSHIP_EXPIRED, undefined, {
         endDate,
       });
@@ -156,6 +167,9 @@ export class CheckinsService {
         daysLeft: left,
         createdAt: outcome.checkin.createdAt,
       });
+      // Not for duplicates [R-19].
+      this.notifications.notifyAdmins(checkinAdmin(member, m.tier, left, outcome.checkin.id));
+      this.notifications.notify([user.id], checkinMember(user.firstName, left));
     }
     return {
       result: outcome.kind === 'success' ? 'SUCCESS' : 'DUPLICATE',

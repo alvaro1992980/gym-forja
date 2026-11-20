@@ -922,4 +922,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get checkinInactive =>
       'Your account is deactivated. Visit the front desk.';
+
+  @override
+  String get notificationsTitle => 'Notifications';
+
+  @override
+  String notificationsUnread(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count unread notifications',
+      one: '1 unread notification',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationsUnreadLabel => 'Unread';
+
+  @override
+  String get notificationsReadAll => 'Mark all as read';
+
+  @override
+  String get notificationsEmpty => 'You have no notifications.';
+
+  @override
+  String get pushExplainTitle => 'Turn on notifications';
+
+  @override
+  String get pushExplainBody =>
+      'We\'ll let you know when your membership is about to expire, when you check in, and when there is news from the gym.';
+
+  @override
+  String get pushExplainEnable => 'Turn on';
+
+  @override
+  String get pushExplainLater => 'Not now';
 }

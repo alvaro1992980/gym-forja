@@ -11,6 +11,7 @@ import '../../../../core/widgets/async_view.dart';
 import '../../../../core/widgets/tier_badge.dart';
 import '../../../../l10n/generated/app_localizations.dart';
 import '../../../auth/domain/current_user.dart';
+import '../../../notifications/presentation/notification_bell.dart';
 import 'member_home_providers.dart';
 
 /// Member home (section 9.5 #1): membership card, scan button and this
@@ -30,6 +31,7 @@ class MemberHomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.homeMemberTitle),
         actions: [
+          const NotificationBell(),
           IconButton(
             tooltip: l10n.logout,
             icon: const Icon(Icons.logout),

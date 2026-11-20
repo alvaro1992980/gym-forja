@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../features/auth/data/auth_repository.dart';
 import '../../features/auth/domain/current_user.dart';
 import '../network/api_exception.dart';
+import '../push/push_token.dart';
 import 'token_storage.dart';
 
 part 'session_controller.g.dart';
@@ -96,7 +97,10 @@ class SessionController extends _$SessionController {
     final tokens = await _storage.read();
     if (tokens != null) {
       try {
-        await _repo.logout(tokens.refreshToken);
+        await _repo.logout(
+          tokens.refreshToken,
+          fcmToken: ref.read(registeredPushTokenProvider),
+        );
       } on ApiException {
         // Offline or already revoked: signing out locally is what matters.
       }

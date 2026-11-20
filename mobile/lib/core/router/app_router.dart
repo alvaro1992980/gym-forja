@@ -24,6 +24,7 @@ import '../../features/member/checkin/domain/checkin_result.dart';
 import '../../features/member/checkin/presentation/checkin_result_screen.dart';
 import '../../features/member/checkin/presentation/scanner_screen.dart';
 import '../../features/member/home/presentation/member_home_screen.dart';
+import '../../features/notifications/presentation/inbox_screen.dart';
 import '../../features/trainer/presentation/trainer_home_screen.dart';
 import '../auth/session_controller.dart';
 import '../models/enums.dart';
@@ -38,6 +39,9 @@ abstract final class Routes {
   static const trainer = '/trainer';
   static const member = '/member';
   static const kiosk = '/kiosk';
+
+  /// The inbox inside [role]'s area.
+  static String notificationsFor(Role role) => '${homeFor(role)}/notifications';
 
   static String homeFor(Role role) => switch (role) {
     Role.admin => admin,
@@ -69,13 +73,14 @@ String? redirectFor(SessionState session, String location) {
   }
 }
 
-final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+/// The app's top navigator (full-screen pages and app-wide dialogs).
+final rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 /// Full-screen admin page above the bottom navigation.
 GoRoute _fullScreen(String path, Widget Function(GoRouterState s) build) =>
     GoRoute(
       path: path,
-      parentNavigatorKey: _rootKey,
+      parentNavigatorKey: rootNavigatorKey,
       builder: (_, state) => build(state),
     );
 
@@ -85,7 +90,7 @@ GoRouter router(Ref ref) {
   ref.listen(sessionControllerProvider, (_, _) => refresh.value++);
 
   final router = GoRouter(
-    navigatorKey: _rootKey,
+    navigatorKey: rootNavigatorKey,
     initialLocation: Routes.splash,
     refreshListenable: refresh,
     redirect: (context, state) =>
@@ -101,11 +106,13 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: Routes.trainer,
         builder: (_, _) => const TrainerHomeScreen(),
+        routes: [_inboxRoute()],
       ),
       GoRoute(
         path: Routes.member,
         builder: (_, _) => const MemberHomeScreen(),
         routes: [
+          _inboxRoute(),
           GoRoute(path: 'scan', builder: (_, _) => const ScannerScreen()),
           GoRoute(
             path: 'checkin-result',
@@ -125,6 +132,12 @@ GoRouter router(Ref ref) {
   });
   return router;
 }
+
+GoRoute _inboxRoute() => GoRoute(
+  path: 'notifications',
+  parentNavigatorKey: rootNavigatorKey,
+  builder: (_, _) => const InboxScreen(),
+);
 
 List<RouteBase> _adminRoutes() => [
   StatefulShellRoute.indexedStack(
@@ -214,8 +227,13 @@ List<RouteBase> _adminRoutes() => [
     ],
   ),
   GoRoute(
+    path: '/admin/notifications',
+    parentNavigatorKey: rootNavigatorKey,
+    builder: (_, _) => const InboxScreen(),
+  ),
+  GoRoute(
     path: '/admin/temporary-password',
-    parentNavigatorKey: _rootKey,
+    parentNavigatorKey: rootNavigatorKey,
     redirect: (_, state) =>
         state.extra is TemporaryPasswordArgs ? null : Routes.admin,
     builder: (_, state) =>

@@ -13,6 +13,8 @@ import { AppException } from '../../common/errors/app.exception';
 import { ErrorCode } from '../../common/errors/error-codes';
 import { Paginated, paginated, skipTake } from '../../common/pagination/pagination';
 import { PrismaService } from '../../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
+import { paymentRecorded, tierChanged } from '../notifications/templates';
 import { PricingService } from '../pricing/pricing.service';
 import {
   CreatePaymentDto,
@@ -55,6 +57,7 @@ export class PaymentsService {
     private readonly clock: ClockService,
     private readonly memberships: MembershipsService,
     private readonly pricing: PricingService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   private async requireMembership(memberId: string) {
@@ -142,6 +145,10 @@ export class PaymentsService {
       m = await this.memberships.refreshNextTier(tx, m, today);
       return { payment, membership: m };
     });
+    this.notifications.notify(
+      [memberId],
+      paymentRecorded(dto.tier, formatLocalDate(membership.endDate)),
+    );
     return { payment: toPaymentDto(payment), membership: toMembershipSummary(membership, today) };
   }
 
@@ -238,6 +245,7 @@ export class PaymentsService {
       m = await this.memberships.refreshNextTier(tx, m, today);
       return { m, payment };
     });
+    this.notifications.notify([memberId], tierChanged(dto.toTier));
     return {
       membership: toMembershipSummary(result.m, today),
       payment: result.payment ? toPaymentDto(result.payment) : null,

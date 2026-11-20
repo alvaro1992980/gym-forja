@@ -5,6 +5,7 @@ import { AppModule } from '../../src/app.module';
 import { configureApp } from '../../src/app.setup';
 import { ClockService, FixedClockService } from '../../src/common/clock/clock.service';
 import { AppConfigService } from '../../src/config/app-config.service';
+import { PushSender } from '../../src/modules/notifications/push.sender';
 import { PrismaService } from '../../src/prisma/prisma.service';
 
 export interface TestApp {
@@ -16,11 +17,15 @@ export interface TestApp {
 
 /**
  * Boots the real AppModule with the same global setup as main.ts.
- * Pass `now` to freeze the clock (section 11: tests never depend on the real date).
+ * Pass `now` to freeze the clock (section 11: tests never depend on the real date) and `push`
+ * to record pushes instead of logging them.
  */
-export async function createTestApp(options: { now?: string } = {}): Promise<TestApp> {
+export async function createTestApp(
+  options: { now?: string; push?: PushSender } = {},
+): Promise<TestApp> {
   let clock: FixedClockService | undefined;
   let builder = Test.createTestingModule({ imports: [AppModule] });
+  if (options.push) builder = builder.overrideProvider(PushSender).useValue(options.push);
   if (options.now) {
     const now = options.now;
     builder = builder.overrideProvider(ClockService).useFactory({

@@ -922,4 +922,40 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get checkinInactive =>
       'Tu cuenta está desactivada. Acércate a recepción.';
+
+  @override
+  String get notificationsTitle => 'Notificaciones';
+
+  @override
+  String notificationsUnread(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count notificaciones sin leer',
+      one: '1 notificación sin leer',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationsUnreadLabel => 'Sin leer';
+
+  @override
+  String get notificationsReadAll => 'Marcar todo como leído';
+
+  @override
+  String get notificationsEmpty => 'No tienes notificaciones.';
+
+  @override
+  String get pushExplainTitle => 'Activa las notificaciones';
+
+  @override
+  String get pushExplainBody =>
+      'Te avisaremos cuando tu membresía esté por vencer, cuando registres tu ingreso y cuando haya novedades del gimnasio.';
+
+  @override
+  String get pushExplainEnable => 'Activar';
+
+  @override
+  String get pushExplainLater => 'Ahora no';
 }

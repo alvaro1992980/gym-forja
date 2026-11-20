@@ -45,7 +45,7 @@ final class MemberFiltersControllerProvider
 }
 
 String _$memberFiltersControllerHash() =>
-    r'26b2536b68b99e35bc37a64c653fb8fe54c01921';
+    r'0e45bf1b1e06da96de7ccdb608bd7e56bed5f8d1';
 
 /// Search text and filter chips of the members list.
 

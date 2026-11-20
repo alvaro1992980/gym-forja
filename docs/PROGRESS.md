@@ -10,7 +10,7 @@
 | D5 Admin member UI | ✅ | 2026-11-19 | Admin bottom nav; members list (search, filters, paging), new-member stepper with one-time temporary password (copy/share), member detail, renew, tier change, void, edit, reset password, deactivate; Precios, Personal (staff creation), Configuración. Full flow verified on the emulator against the real backend. |
 | D6 Check-in backend | ✅ | 2026-11-19 | Rotating kiosk QR tokens, `POST /checkins` with [R-17]–[R-23] and attempt logging, admin lists (check-ins, inside now, attempts), `/me/checkins`, Socket.IO `/realtime` with JWT handshake and `admins` room. |
 | D7 Check-in mobile | ✅ | 2026-11-19 | Kiosk QR screen (rotation, offline, wakelock/immersive/portrait, hidden admin exit), member home (membership card, scan button, monthly attendance calendar), scanner with permission flow, every result variant, admin live check-ins (Adentro ahora / Hoy) and a live "last check-ins" dashboard list over Socket.IO. Verified end to end on the emulator against the real backend. |
-| D8 Notifications & scheduler | ⬜ | | |
+| D8 Notifications & scheduler | 🟡 | 2026-11-19 | `notifications` module (templates, inbox, devices, FCM sender with invalid-token cleanup, `PUSH_ENABLED`), hooks on check-in/renewal/tier change, `scheduler` (daily 08:00 expiry job with idempotency, nightly 23:59 no-op, admin run endpoint), mobile push (permission, token, banners, tap routing) and inbox with unread badge, `docs/FIREBASE_SETUP.md`. Code complete; the two real-device push criteria wait for the owner's Firebase project. |
 | D9 Dashboard & reports | ⬜ | | |
 | D10 v1 hardening & Android release | ⬜ | | |
 | D11 Plans (PLUS) backend + builder | ⬜ | | |
@@ -162,6 +162,21 @@ that use it (kiosk QR, scanner, live feed) are D7.
 Done: check-in works end to end on one emulator playing kiosk, member and admin in turn (the
 camera is replaced by the QR the kiosk screen shows). The two-phone run is in the manual QA list.
 
+## D8 — Push notifications, scheduler, inbox
+
+- [x] `docs/FIREBASE_SETUP.md`: project, Android `google-services.json`, iOS APNs key + `GoogleService-Info.plist`, backend service account, how to check
+- [x] Backend `notifications`: templates (section 7, Spanish), store + send in the background, invalid token cleanup, `PUSH_ENABLED=false` → store and log only; `POST/DELETE /me/devices`, `GET /me/notifications` (+ `unreadCount`), read / read-all
+- [x] Hooks: check-in (`CHECKIN_ADMIN`, `CHECKIN_MEMBER`; none for duplicates), expired scan (`CHECKIN_DENIED_ADMIN`, `CHECKIN_DENIED_MEMBER`), renewal (`PAYMENT_RECORDED`), tier change (`TIER_CHANGED`)
+- [x] `scheduler`: daily 08:00 gym time [R-24]–[R-26] with `NotificationLog`; nightly 23:59 for [R-30] (no-op until D12); `POST /admin/jobs/:name/run` (ADMIN, non-production)
+- [x] Mobile: explanation → permission request (once), token registration on login and refresh, token removed on logout, foreground banner + badge refresh, tap routing (background, terminated, banner, inbox), inbox screen with unread badge on member, admin and trainer homes
+- [x] Acceptance: running the daily job twice the same day sends each reminder once (e2e with an injected clock: [R-25]; also [R-24] selection and [R-26] after a renewal)
+- [ ] Acceptance: check-in triggers pushes to the admin and the member phone (real devices). Covered end to end with a recording push sender (e2e: both stored and sent to their devices), and on the emulator the inbox shows both; real pushes need the owner's Firebase project (FIREBASE_SETUP.md)
+- [ ] Acceptance: tapping a notification opens the right screen from background and terminated states. Routing for both states is covered by widget tests with a fake push service; a real tap needs Firebase
+- [x] Verification: backend lint, test (194), test:e2e (147), build; mobile analyze, test (122), format; emulator integration tests for D7 and D8 passed
+
+Status: code complete and verified without Firebase. The deliverable becomes ✅ once the owner
+adds the Firebase files and the two real-device checks pass (manual QA below).
+
 ## Manual QA checklists
 
 ### D0
@@ -222,3 +237,14 @@ check-in appears live in 318 ms.
 - [ ] Two physical devices: tablet/phone as kiosk, a real phone camera scanning it, a third (or the kiosk after exit) as admin
 - [ ] Screenshot of the QR scanned after 45 s with a real camera is rejected
 - [ ] Torch and the camera permission dialogs on a real phone
+
+### D8
+Run as `integration_test/notifications_flow_test.dart` on the emulator against the real backend
+(`gym_test`, `PUSH_ENABLED=false`, no `google-services.json`): the app starts with push disabled,
+a check-in and a renewal put 2 unread notifications on the member's bell, the inbox lists them
+newest first, tapping one opens the home and marks it read, "mark all as read" clears the
+badge, and the admin's "Ingreso" opens the member detail.
+- [ ] Owner: Firebase project + files (docs/FIREBASE_SETUP.md)
+- [ ] Two Android phones: check-in → push on the admin and member phones
+- [ ] Tap from background and from a closed app opens the member detail / home
+- [ ] Daily job via `POST /admin/jobs/daily-expiry/run` with a member 7 days from expiry → one push; second run → none

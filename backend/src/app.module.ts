@@ -13,8 +13,10 @@ import { CheckinsModule } from './modules/checkins/checkins.module';
 import { HealthModule } from './modules/health/health.module';
 import { KioskModule } from './modules/kiosk/kiosk.module';
 import { MembershipsModule } from './modules/memberships/memberships.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PricingModule } from './modules/pricing/pricing.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
+import { SchedulerModule } from './modules/scheduler/scheduler.module';
 import { SettingsModule } from './modules/settings/settings.module';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -30,6 +32,7 @@ import { PrismaModule } from './prisma/prisma.module';
     ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 120 }]),
     PrismaModule,
     ClockModule,
+    NotificationsModule,
     HealthModule,
     AuthModule,
     UsersModule,
@@ -39,6 +42,7 @@ import { PrismaModule } from './prisma/prisma.module';
     KioskModule,
     CheckinsModule,
     RealtimeModule,
+    SchedulerModule,
   ],
   // Global guards run in this order: rate limit → access token → forced password change → roles.
   providers: [

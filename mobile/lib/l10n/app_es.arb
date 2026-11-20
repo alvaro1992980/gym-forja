@@ -317,5 +317,16 @@
   "checkinExpiredBody": "Acércate a recepción para renovar y seguir entrenando.",
   "checkinInvalidQr": "Código no válido, vuelve a escanear.",
   "checkinScanAgain": "Escanear de nuevo",
-  "checkinInactive": "Tu cuenta está desactivada. Acércate a recepción."
+  "checkinInactive": "Tu cuenta está desactivada. Acércate a recepción.",
+
+  "notificationsTitle": "Notificaciones",
+  "notificationsUnread": "{count, plural, =1{1 notificación sin leer} other{{count} notificaciones sin leer}}",
+  "@notificationsUnread": { "placeholders": { "count": { "type": "int" } } },
+  "notificationsUnreadLabel": "Sin leer",
+  "notificationsReadAll": "Marcar todo como leído",
+  "notificationsEmpty": "No tienes notificaciones.",
+  "pushExplainTitle": "Activa las notificaciones",
+  "pushExplainBody": "Te avisaremos cuando tu membresía esté por vencer, cuando registres tu ingreso y cuando haya novedades del gimnasio.",
+  "pushExplainEnable": "Activar",
+  "pushExplainLater": "Ahora no"
 }

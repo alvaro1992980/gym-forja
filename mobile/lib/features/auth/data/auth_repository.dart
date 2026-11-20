@@ -44,9 +44,13 @@ class AuthRepository {
     ),
   );
 
-  /// Revokes the refresh token on the server.
-  Future<void> logout(String refreshToken) => apiCall(
-    () => _dio.post<void>('/auth/logout', data: {'refreshToken': refreshToken}),
+  /// Revokes the refresh token on the server and, with [fcmToken], deletes
+  /// this device's push registration (section 9.1 #4).
+  Future<void> logout(String refreshToken, {String? fcmToken}) => apiCall(
+    () => _dio.post<void>(
+      '/auth/logout',
+      data: {'refreshToken': refreshToken, 'fcmToken': ?fcmToken},
+    ),
   );
 }
 
